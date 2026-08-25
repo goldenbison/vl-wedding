@@ -33,8 +33,17 @@ const DEFS = `
   </defs>
 </svg>`
 
-const rnd = (a, b) => a + Math.random() * (b - a)
-const leafId = () => (Math.random() < 0.55 ? 'oakleaf-a' : 'oakleaf-b')
+// seeded PRNG (mulberry32) — the ambience lays out identically on every load
+let seed = 20261104
+function srand() {
+  seed |= 0
+  seed = (seed + 0x6d2b79f5) | 0
+  let t = Math.imul(seed ^ (seed >>> 15), 1 | seed)
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+}
+const rnd = (a, b) => a + srand() * (b - a)
+const leafId = () => (srand() < 0.55 ? 'oakleaf-a' : 'oakleaf-b')
 
 // wiggling leaves overlaid on the painted canopy [x%, y%] of the image
 const CANOPY_SPOTS = [
@@ -72,7 +81,7 @@ export function startAmbient() {
   for (let i = 0; i < LEAVES; i++) {
     const p = el('div', 'leaf')
     p.style.setProperty('--x', `${rnd(2, 46).toFixed(1)}vw`)
-    p.style.setProperty('--y0', `${rnd(2, 50).toFixed(1)}vh`)
+    p.style.setProperty('--y0', `${rnd(2, 50).toFixed(1)}svh`)
     p.style.setProperty('--size', `${rnd(16, 27).toFixed(0)}px`)
     p.style.setProperty('--dur', `${rnd(13, 24).toFixed(1)}s`)
     p.style.setProperty('--delay', `${(-rnd(0, 26)).toFixed(1)}s`)
@@ -89,14 +98,14 @@ export function startAmbient() {
   const ORBS = innerWidth < 700 ? 4 : 6
   for (let i = 0; i < ORBS; i++) {
     const o = el('span', 'orb')
-    const size = 6 + Math.random() * 16
+    const size = rnd(6, 22)
     o.style.setProperty('--x', `${rnd(35, 96).toFixed(1)}vw`)
-    o.style.setProperty('--y', `${rnd(10, 88).toFixed(1)}vh`)
+    o.style.setProperty('--y', `${rnd(10, 88).toFixed(1)}svh`)
     o.style.setProperty('--size', `${size.toFixed(1)}px`)
     o.style.setProperty('--blur', `${(size / 10 + 0.6).toFixed(1)}px`)
     o.style.setProperty('--op', rnd(0.14, 0.32).toFixed(2))
     o.style.setProperty('--dx', `${rnd(-7, 7).toFixed(1)}vw`)
-    o.style.setProperty('--dy', `${(-4 - Math.random() * 9).toFixed(1)}vh`)
+    o.style.setProperty('--dy', `${rnd(-13, -4).toFixed(1)}svh`)
     o.style.setProperty('--sc', rnd(0.8, 1.3).toFixed(2))
     o.style.setProperty('--dur', `${rnd(17, 30).toFixed(1)}s`)
     o.style.setProperty('--pulse', `${rnd(4, 9).toFixed(1)}s`)
