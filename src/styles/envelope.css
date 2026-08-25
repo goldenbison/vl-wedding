@@ -270,7 +270,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-top: 3px;
+  padding-top: 9px;
   background: var(--gold-grad);
   -webkit-background-clip: text;
   background-clip: text;
