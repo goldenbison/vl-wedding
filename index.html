@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>វិកទ័រ & លក្ខណា — 04.11.2026</title>
+  <meta name="description" content="សិរីមង្គលអាពាហ៍ពិពាហ៍ ខូវ ទី វិកទ័រ & និត លុចលក្ខណា — ថ្ងៃពុធ ទី០៤ ខែវិច្ឆិកា ឆ្នាំ២០២៦ វេលាម៉ោង ៥:០០ល្ងាច នៅសណ្ឋាគារ សុខា ភ្នំពេញ (ជ្រោយចង្វារ)" />
+  <meta name="theme-color" content="#0e1040" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Victor & Luxlakna — Wedding Invitation" />
+  <meta property="og:description" content="Wednesday, 04 November 2026 · 5:00 PM · Sokha Phnom Penh Hotel (Chroy Changvar)" />
+  <meta property="og:image" content="/assets/card/cover-front.jpg" />
+  <link rel="icon" href="/favicon.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Moul&family=Battambang:wght@300;400;700&family=Cinzel:wght@600;700&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet" />
+  <link rel="preload" as="image" href="/assets/card/cover-front.jpg" />
+  <link rel="stylesheet" href="/src/styles/base.css" />
+  <link rel="stylesheet" href="/src/styles/envelope.css" />
+  <link rel="stylesheet" href="/src/styles/site.css" />
+  <link rel="stylesheet" href="/src/styles/ambient.css" />
+</head>
+<body class="is-locked">
+
+  <!-- fixed page backdrop (navy + soft glows) — everything sits above this -->
+  <div id="backdrop" aria-hidden="true"></div>
+
+  <!-- ambient petals & light, BEHIND all content (visible only in empty space) -->
+  <div id="ambient" aria-hidden="true"></div>
+
+  <!-- film grain + vignette over everything (pure lighting, no pattern) -->
+  <div id="grain" aria-hidden="true"></div>
+
+  <!-- music on/off -->
+  <button id="musicToggle" class="music-toggle" type="button" aria-label="បើក/បិទ តន្ត្រី" hidden></button>
+
+  <!-- ===== scene 1 · the envelope ===== -->
+  <section id="envelopeScene" class="envelope-scene" aria-label="សំបុត្រអញ្ជើញ">
+    <div class="env-stars" aria-hidden="true"></div>
+    <div class="env-stage">
+      <div class="env-perspective">
+        <div class="env-flip" id="envFlip">
+          <!-- front: the real printed cover -->
+          <div class="env-side env-side-front">
+            <img class="env-cover" id="envCover" alt="" draggable="false" />
+            <div class="env-guest-name" id="envGuestName"></div>
+            <div class="env-edge" aria-hidden="true"></div>
+            <div class="env-sheen" aria-hidden="true"></div>
+          </div>
+          <!-- back: the printed gatefold — two doors split the badge at the
+               center seam; their inner faces are the printed interior panels -->
+          <div class="env-side env-side-back">
+            <div class="gate-inside">
+              <div class="env-card" id="envCard"><img id="envCardImg" alt="" draggable="false" /></div>
+            </div>
+            <div class="gate-door gate-door-l" id="doorL">
+              <div class="gd-face gd-outer"></div>
+              <div class="gd-face gd-inner"><img id="doorInnerL" alt="" draggable="false" /></div>
+            </div>
+            <div class="gate-door gate-door-r" id="doorR">
+              <div class="gd-face gd-outer"></div>
+              <div class="gd-face gd-inner"><img id="doorInnerR" alt="" draggable="false" /></div>
+            </div>
+          </div>
+        </div>
+        <div class="env-shadow" aria-hidden="true"></div>
+      </div>
+      <button class="env-open-btn" id="envOpenBtn" type="button"></button>
+    </div>
+    <button class="env-tap" id="envTap" type="button" aria-label="បើកលិខិតអញ្ជើញ"></button>
+  </section>
+
+  <!-- the rising card is cloned here for the zoom-to-hero animation -->
+  <div id="cardFly" aria-hidden="true" hidden></div>
+
+  <!-- ===== scene 2 · the invitation ===== -->
+  <main id="site" class="site" hidden>
+    <header id="home" class="hero"></header>
+    <section id="procession" class="section"></section>
+    <section id="agenda" class="section"></section>
+    <section id="location" class="section"></section>
+    <section id="gallery" class="section"></section>
+    <section id="wishes" class="section"></section>
+    <section id="thanks" class="section"></section>
+    <footer id="footer" class="footer"></footer>
+  </main>
+
+  <nav id="dock" class="dock" hidden aria-label="រុករកទំព័រ"></nav>
+  <div id="lightbox" class="lightbox" hidden></div>
+  <div id="toast" class="toast" hidden></div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

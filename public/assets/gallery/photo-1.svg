@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1e2757"/>
+      <stop offset=".55" stop-color="#131a45"/>
+      <stop offset="1" stop-color="#0f1538"/>
+    </linearGradient>
+    <linearGradient id="au" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f2dfa7"/>
+      <stop offset=".5" stop-color="#d9b869"/>
+      <stop offset="1" stop-color="#b98f3e"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="1000" fill="url(#bg)"/>
+  <rect x="26" y="26" width="748" height="948" fill="none" stroke="url(#au)" stroke-width="2" opacity=".7"/>
+  <rect x="38" y="38" width="724" height="924" fill="none" stroke="url(#au)" stroke-width="1" opacity=".4"/>
+  <g transform="translate(400 500)" opacity=".5">
+    <ellipse rx="120" ry="150" fill="none" stroke="url(#au)" stroke-width="3"/>
+    <ellipse rx="98" ry="128" fill="none" stroke="url(#au)" stroke-width="1.4" stroke-dasharray="1 12" stroke-linecap="round"/>
+    <text y="34" text-anchor="middle" font-size="96" fill="url(#au)" font-family="Moul, serif">វល</text>
+  </g>
+  <text x="400" y="930" text-anchor="middle" font-size="30" fill="#e3c583" font-family="Battambang, sans-serif" opacity=".85">រូបភាព Pre-Wedding · ១</text>
+</svg>

@@ -1,0 +1,574 @@
+/* ==========================================================================
+   Scene 2 — the invitation site. Every card is the real printed artwork.
+   ========================================================================== */
+.site {
+  position: relative;
+  z-index: 20; /* above #ambient — petals show only through empty space */
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+.site.site-in { opacity: 1; }
+
+.section { padding: 3.2rem 1.05rem; position: relative; }
+.section-inner { max-width: 620px; margin: 0 auto; }
+
+/* tablet & desktop get more generous columns */
+@media (min-width: 900px) {
+  .section { padding: 4rem 1.4rem; }
+  .section-inner { max-width: 720px; }
+  .section-inner.narrow { max-width: 540px; }
+  .section-inner.wide { max-width: 1000px; }
+}
+
+/* --------------------------------------------------------------------------
+   Artwork cards — the printed panels, presented like real paper
+   -------------------------------------------------------------------------- */
+.art-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border-radius: 8px;
+  background: var(--cream);
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.45),
+    0 28px 60px -22px rgba(0, 0, 0, 0.75),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+.art-card img {
+  display: block;
+  width: 100%;
+  border-radius: 8px;
+}
+.art-card::after {
+  /* paper sheen */
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.05) 0%, transparent 30%, transparent 75%, rgba(0, 0, 0, 0.05) 100%);
+  pointer-events: none;
+}
+
+/* narrow panels (agenda, thanks) sit in a slimmer column */
+.section-inner.narrow { max-width: 480px; }
+
+/* ==========================================================================
+   Hero — the invitation panel itself (the flying card lands here)
+   ========================================================================== */
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 4.6rem 1.05rem 5.8rem;
+}
+.hero-inner {
+  width: 100%;
+  max-width: 620px;
+  text-align: center;
+}
+@media (min-width: 900px) { .hero-inner { max-width: 720px; } }
+.hero-card-wrap { position: relative; }
+
+/* guest name in the printed frame from the cover */
+.hero-guest-block { margin-top: clamp(1.8rem, 4vh, 2.8rem); }
+.hero-guest-frame {
+  position: relative;
+  width: min(94%, 580px);
+  margin: 0 auto;
+  /* tight dark edge keeps the printed gold lettering crisp over the oak */
+  filter: drop-shadow(0 1px 3px rgba(5, 7, 24, 0.9)) drop-shadow(0 4px 18px rgba(0, 0, 0, 0.45));
+}
+.hero-guest-frame::before {
+  /* glass panel inside the printed box, like the countdown tiles */
+  content: '';
+  position: absolute;
+  inset: 43% 14.4% 12% 14.4%;
+  background: rgba(14, 16, 58, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 4px;
+  box-shadow: inset 0 1px 0 rgba(242, 227, 187, 0.08);
+}
+.hero-guest-frame img { position: relative; width: 100%; display: block; z-index: 1; }
+.hero-guest-name {
+  /* centered inside the printed box (lower part of the crop) */
+  position: absolute;
+  inset: 41% 13.5% 10% 13.5%;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 5px;
+  font-family: var(--font-kh);
+  font-weight: 700;
+  font-size: clamp(1.05rem, 4.4vw, 1.6rem);
+  line-height: 1;
+  color: var(--gold-200);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  white-space: nowrap;
+}
+
+/* countdown — generous, it owns the space under the card */
+.countdown { margin-top: clamp(1.8rem, 4.5vh, 3rem); }
+.countdown-title {
+  font-size: clamp(0.95rem, 2.6vw, 1.2rem);
+  color: var(--gold-200);
+  text-shadow: 0 1px 3px rgba(5, 7, 24, 0.9), 0 0 16px rgba(5, 7, 24, 0.75);
+  margin-bottom: clamp(0.8rem, 2vh, 1.2rem);
+}
+.count-grid { display: flex; justify-content: center; gap: clamp(0.55rem, 2vw, 1.1rem); }
+.count-cell {
+  min-width: clamp(74px, 20vw, 122px);
+  padding: clamp(0.7rem, 2vh, 1.15rem) 0.5rem clamp(0.6rem, 1.6vh, 1rem);
+  border: 1px solid rgba(217, 174, 99, 0.5);
+  border-radius: 14px;
+  background: rgba(13, 15, 52, 0.74);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  box-shadow: 0 12px 30px -18px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(242, 227, 187, 0.08);
+}
+.count-num {
+  font-family: var(--font-caps);
+  font-weight: 600;
+  font-size: clamp(1.9rem, 6vw, 3rem);
+  line-height: 1.15;
+  background: var(--gold-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.count-label { font-size: clamp(0.74rem, 2vw, 0.95rem); color: rgba(242, 227, 187, 0.9); text-shadow: 0 1px 3px rgba(5, 7, 24, 0.9); margin-top: 0.3rem; }
+.countdown-done { font-size: 1.05rem; color: var(--gold-200); }
+
+/* scroll cue lives in the flow now — it can never overlap the countdown */
+.scroll-cue {
+  margin-top: clamp(2rem, 5vh, 3.2rem);
+  color: var(--gold-300);
+  text-shadow: 0 1px 3px rgba(5, 7, 24, 0.9);
+  font-size: 0.82rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  animation: hint-bob 2.6s ease-in-out infinite;
+  opacity: 0.85;
+}
+.scroll-cue .icon { width: 18px; height: 18px; }
+
+/* ==========================================================================
+   Location
+   ========================================================================== */
+.loc-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 1.2rem;
+}
+.loc-venue-en {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 1.02rem;
+  color: rgba(242, 227, 187, 0.95);
+  text-shadow: 0 1px 3px rgba(5, 7, 24, 0.9), 0 0 14px rgba(5, 7, 24, 0.7);
+  text-align: center;
+  margin-top: 1rem;
+}
+.loc-buttons { margin-top: 1.4rem; gap: 0.8rem; }
+
+/* ==========================================================================
+   Cream form card (wishes) — kept to the simple printed-frame style
+   ========================================================================== */
+.paper {
+  position: relative;
+  background: var(--cream);
+  color: var(--ink);
+  border-radius: 10px;
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.4),
+    0 24px 54px -22px rgba(0, 0, 0, 0.7);
+}
+.paper::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1.5px solid rgba(217, 174, 99, 0.9);
+  border-radius: 5px;
+  pointer-events: none;
+}
+.paper::after {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border: 1px solid rgba(217, 174, 99, 0.45);
+  border-radius: 4px;
+  pointer-events: none;
+}
+.paper-inner { position: relative; padding: 1.9rem 1.35rem; z-index: 1; text-align: center; }
+
+/* ==========================================================================
+   Gallery — shuffled pages of six with album chips
+   ========================================================================== */
+.g-chips {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-bottom: 1.1rem;
+}
+.g-chip {
+  padding: 0.5rem 1.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(217, 174, 99, 0.6);
+  color: var(--gold-200);
+  background: rgba(14, 16, 58, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  font-family: var(--font-caps);
+  font-weight: 600;
+  font-size: 0.82rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
+}
+.g-chip:hover { transform: translateY(-1px); }
+.g-chip.active {
+  background: var(--gold-grad);
+  color: #241a06;
+  border-color: transparent;
+  font-weight: 700;
+}
+
+.g-stage { position: relative; }
+.g-viewport { overflow: hidden; margin: -6px; padding: 6px; }
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  transition: transform 0.23s ease, opacity 0.23s ease;
+}
+@media (min-width: 700px) { .gallery-grid { grid-template-columns: repeat(3, 1fr); } }
+.gallery-grid.g-exit-l { transform: translateX(-46px); opacity: 0; }
+.gallery-grid.g-exit-r { transform: translateX(46px); opacity: 0; }
+.gallery-grid.g-enter-r { transform: translateX(46px); opacity: 0; transition: none; }
+.gallery-grid.g-enter-l { transform: translateX(-46px); opacity: 0; transition: none; }
+
+.g-item {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(217, 174, 99, 0.35);
+  background: var(--navy-deep);
+  padding: 0;
+  box-shadow: 0 14px 30px -16px rgba(0, 0, 0, 0.7);
+}
+.g-item img, .g-item video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+.g-item:hover img { transform: scale(1.05); }
+.g-item .g-play {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(9, 11, 34, 0.35);
+  color: var(--gold-100);
+}
+.g-item .g-play .icon {
+  width: 42px;
+  height: 42px;
+  padding: 10px;
+  border-radius: 50%;
+  background: rgba(14, 16, 58, 0.75);
+  border: 1px solid rgba(217, 174, 99, 0.7);
+  box-sizing: content-box;
+}
+.g-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem 1rem;
+  color: rgba(242, 227, 187, 0.75);
+  text-shadow: 0 1px 3px rgba(5, 7, 24, 0.9);
+}
+
+/* paging chevrons, pinned 25px in from the screen edges at any column width */
+.g-next,
+.g-prev {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  color: var(--gold-200);
+  background: rgba(14, 16, 58, 0.82);
+  border: 1px solid rgba(217, 174, 99, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.8);
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+.g-next { right: calc((100% - 100vw) / 2 + 25px); }
+.g-prev { left: calc((100% - 100vw) / 2 + 25px); }
+.g-next:hover, .g-prev:hover { transform: translateY(-50%) scale(1.08); background: rgba(217, 174, 99, 0.2); }
+.g-next .icon, .g-prev .icon { width: 22px; height: 22px; }
+@media (max-width: 700px) { .g-next, .g-prev { width: 44px; height: 44px; } }
+
+/* ==========================================================================
+   Wishes
+   ========================================================================== */
+/* intertwined rings ornament above the form */
+.wish-ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  margin-bottom: 1.2rem;
+  color: var(--gold-600);
+}
+.wish-ornament .wo-rings { width: 40px; height: 40px; stroke-width: 1.3; }
+.wish-ornament .wo-line {
+  width: 64px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(185, 143, 69, 0.7));
+}
+.wish-ornament .wo-line:last-child {
+  background: linear-gradient(270deg, transparent, rgba(185, 143, 69, 0.7));
+}
+
+.wish-form { display: flex; flex-direction: column; gap: 0.8rem; text-align: left; }
+.wish-field input, .wish-field textarea {
+  width: 100%;
+  background: #fffef9;
+  border: 1px solid rgba(185, 143, 69, 0.5);
+  border-radius: 9px;
+  padding: 0.65rem 0.9rem;
+  color: var(--ink);
+  font-size: 0.92rem;
+  line-height: 1.7;
+  outline: none;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.wish-field input:focus, .wish-field textarea:focus {
+  border-color: var(--gold-500);
+  box-shadow: 0 0 0 3px rgba(217, 174, 99, 0.22);
+}
+.wish-field textarea { resize: vertical; min-height: 104px; }
+.wish-form .btn { align-self: center; min-width: 220px; }
+.wish-form .btn[disabled] { opacity: 0.55; pointer-events: none; }
+
+.wish-layout { display: grid; gap: 1.6rem; }
+@media (min-width: 960px) {
+  .wish-layout { grid-template-columns: 1fr 1fr; align-items: start; }
+  .wish-layout .wish-list { margin-top: 0; }
+  .wish-layout .paper { position: sticky; top: 1.4rem; }
+}
+
+.wish-list { margin-top: 1.6rem; display: flex; flex-direction: column; gap: 0.8rem; }
+.wish-empty { text-align: center; color: rgba(242, 227, 187, 0.75); text-shadow: 0 1px 3px rgba(5, 7, 24, 0.9); font-size: 0.9rem; }
+.wish-card {
+  background: var(--cream);
+  color: var(--ink);
+  border-radius: 10px;
+  border: 1px solid rgba(185, 143, 69, 0.45);
+  padding: 0.95rem 1.1rem 0.8rem;
+  text-align: left;
+  box-shadow: 0 12px 30px -16px rgba(0, 0, 0, 0.6);
+}
+.wish-card .icon { width: 20px; height: 20px; color: var(--gold-500); }
+.wish-msg { font-size: 0.92rem; margin-top: 0.15rem; overflow-wrap: anywhere; }
+.wish-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+  border-top: 1px dashed rgba(185, 143, 69, 0.35);
+  padding-top: 0.45rem;
+}
+.wish-name { font-weight: 700; font-size: 0.86rem; color: var(--gold-700); overflow-wrap: anywhere; }
+.wish-time { font-size: 0.74rem; color: var(--ink-soft); white-space: nowrap; }
+
+.wish-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.1rem;
+}
+.wish-pager button {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1px solid rgba(217, 174, 99, 0.5);
+  color: var(--gold-200);
+  background: rgba(217, 174, 99, 0.06);
+  transition: background 0.25s ease, transform 0.25s ease;
+}
+.wish-pager button:hover:not(:disabled) { background: rgba(217, 174, 99, 0.16); transform: translateY(-1px); }
+.wish-pager button:disabled { opacity: 0.35; cursor: default; }
+.wish-pager .icon { width: 21px; height: 21px; }
+.wp-label { font-size: 1rem; color: var(--gold-200); text-shadow: 0 1px 3px rgba(5, 7, 24, 0.9); letter-spacing: 0.08em; min-width: 64px; text-align: center; }
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+.footer {
+  text-align: center;
+  padding: 3rem 1.2rem calc(env(safe-area-inset-bottom, 0px) + 100px);
+  border-top: 1px solid rgba(217, 174, 99, 0.28);
+  background: linear-gradient(180deg, transparent, rgba(6, 7, 26, 0.68) 34%, rgba(6, 7, 26, 0.92));
+}
+.footer-crest {
+  /* transparent-background crest, glowing softly against the page */
+  width: 140px;
+  margin: 0 auto 0.9rem;
+  filter: drop-shadow(0 1px 3px rgba(4, 6, 20, 0.8)) drop-shadow(0 4px 20px rgba(217, 174, 99, 0.3));
+}
+.footer-names {
+  font-family: var(--font-caps);
+  font-weight: 700;
+  letter-spacing: 0.26em;
+  font-size: 0.95rem;
+  color: var(--gold-200);
+  text-shadow: 0 1px 3px rgba(4, 6, 20, 0.9);
+  text-transform: uppercase;
+}
+.footer-date {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: rgba(246, 233, 197, 0.95);
+  text-shadow: 0 1px 3px rgba(4, 6, 20, 0.9);
+  margin-top: 0.35rem;
+}
+.footer-line {
+  font-size: 0.82rem;
+  color: rgba(242, 227, 187, 0.75);
+  text-shadow: 0 1px 3px rgba(4, 6, 20, 0.9);
+  margin-top: 0.9rem;
+}
+
+/* ==========================================================================
+   Bottom dock nav
+   ========================================================================== */
+.dock {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+  z-index: 55;
+  display: flex;
+  gap: 0.15rem;
+  padding: 0.3rem;
+  border-radius: 999px;
+  background: rgba(11, 13, 46, 0.85);
+  border: 1px solid rgba(217, 174, 99, 0.4);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 16px 40px -14px rgba(0, 0, 0, 0.85);
+  opacity: 0;
+  translate: 0 16px;
+  transition: opacity 0.7s ease 0.4s, translate 0.7s ease 0.4s;
+}
+.dock.dock-in { opacity: 1; translate: 0 0; }
+.dock-btn {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  color: rgba(242, 227, 187, 0.72);
+  transition: color 0.25s ease, background 0.25s ease;
+}
+.dock-btn .icon { width: 27px; height: 27px; }
+@media (min-width: 768px) {
+  .dock-btn { width: 64px; height: 64px; }
+  .dock-btn .icon { width: 29px; height: 29px; }
+}
+.dock-btn.active { color: #241a06; background: var(--gold-grad); }
+.dock-btn:not(.active):hover { color: var(--gold-200); }
+
+/* ==========================================================================
+   Lightbox
+   ========================================================================== */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(5, 6, 22, 0.95);
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.lightbox.lb-in { opacity: 1; }
+.lb-media { max-width: 96vw; max-height: 80vh; display: grid; place-items: center; }
+.lb-media img, .lb-media video {
+  max-width: 96vw;
+  max-height: 80vh;
+  width: auto;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.9);
+}
+.lb-caption { color: var(--gold-100); font-size: 0.88rem; margin-top: 0.8rem; text-align: center; }
+.lb-counter {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 18px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-caps);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  font-size: 0.8rem;
+  color: var(--gold-300);
+}
+.lb-btn {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  color: var(--gold-200);
+  background: rgba(14, 16, 58, 0.6);
+  border: 1px solid rgba(217, 174, 99, 0.5);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.lb-btn:hover { transform: scale(1.08); background: rgba(217, 174, 99, 0.18); }
+.lb-btn .icon { width: 22px; height: 22px; }
+.lb-close { top: calc(env(safe-area-inset-top, 0px) + 12px); right: 14px; }
+.lb-prev { left: 10px; top: 50%; transform: translateY(-50%); }
+.lb-next { right: 10px; top: 50%; transform: translateY(-50%); }
+.lb-prev:hover { transform: translateY(-50%) scale(1.08); }
+.lb-next:hover { transform: translateY(-50%) scale(1.08); }
+
+/* ==========================================================================
+   Scroll reveal
+   ========================================================================== */
+.reveal { opacity: 0; transform: translateY(26px); transition: opacity 0.85s ease, transform 0.85s ease; }
+.reveal.in-view { opacity: 1; transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .scroll-cue { animation: none; }
+  html { scroll-behavior: auto; }
+}

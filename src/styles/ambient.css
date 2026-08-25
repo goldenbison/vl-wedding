@@ -1,0 +1,128 @@
+/* ==========================================================================
+   Ambient layer — the golden oak painting on the left, its leaves rustling
+   and falling. Sits BEHIND the content (z below the site / envelope scene),
+   so it only shows through the empty navy around and between the cards.
+   ========================================================================== */
+#ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* --- the oak painting, framing the page from the left ---------------------- */
+.amb-tree-wrap {
+  position: absolute;
+  left: clamp(-150px, -7vw, -34px);
+  top: -10px;
+  height: 103vh;
+  aspect-ratio: 1100 / 1467;
+  opacity: 0.8;
+  transform-origin: 20% 8%;
+  animation: tree-sway 14s ease-in-out infinite alternate;
+  will-change: transform;
+}
+.amb-tree-img {
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+  display: block;
+}
+@keyframes tree-sway {
+  from { transform: rotate(-0.2deg); }
+  to { transform: rotate(0.3deg); }
+}
+@media (max-width: 700px) {
+  .amb-tree-wrap { height: 78vh; opacity: 0.6; left: -22vw; }
+}
+
+/* leaves wiggling on the painted canopy */
+.tl { position: absolute; }
+.tl svg { width: 100%; height: auto; overflow: visible; display: block; }
+.fl {
+  display: block;
+  animation-name: leaf-wiggle;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+@keyframes leaf-wiggle {
+  from { transform: rotate(-8deg) translateY(0.5px); }
+  to { transform: rotate(9deg) translateY(-1.5px); }
+}
+
+/* --- oak leaves falling from the canopy ------------------------------------ */
+.leaf {
+  position: absolute;
+  top: var(--y0, 8vh);
+  left: var(--x, 12vw);
+  width: var(--size, 20px);
+  animation: leaf-fall var(--dur, 22s) linear var(--delay, 0s) infinite;
+  will-change: transform;
+}
+@keyframes leaf-fall {
+  0% { transform: translate3d(0, 0, 0); opacity: 0; }
+  5% { opacity: var(--op, 0.7); }
+  55% { transform: translate3d(calc(var(--sway, 8vw) * 0.72), 52vh, 0); }
+  93% { opacity: var(--op, 0.7); }
+  100% { transform: translate3d(var(--sway, 8vw), 112vh, 0); opacity: 0; }
+}
+
+/* layered rotation gives the tumble: slow spin in the fall plane… */
+.leaf-spin { animation: leaf-spin var(--spin, 10s) linear infinite; }
+@keyframes leaf-spin {
+  from { transform: rotate(var(--rot0, 0deg)); }
+  to { transform: rotate(calc(var(--rot0, 0deg) + 360deg)); }
+}
+/* …and a 3D flutter around its own axis */
+.leaf-flip {
+  animation: leaf-flip var(--flip, 4s) ease-in-out infinite alternate;
+  transform-style: preserve-3d;
+}
+@keyframes leaf-flip {
+  from { transform: perspective(280px) rotateX(34deg) rotateY(-20deg); }
+  to { transform: perspective(280px) rotateX(-26deg) rotateY(26deg); }
+}
+.leaf svg { width: 100%; height: auto; display: block; overflow: visible; }
+
+/* --- faint candle-light orbs ----------------------------------------------- */
+.orb {
+  position: absolute;
+  left: var(--x, 50vw);
+  top: var(--y, 50vh);
+  width: var(--size, 12px);
+  height: var(--size, 12px);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 36% 34%,
+    rgba(248, 228, 178, 0.9),
+    rgba(230, 183, 100, 0.42) 46%,
+    rgba(230, 183, 100, 0) 72%
+  );
+  filter: blur(var(--blur, 2px));
+  opacity: var(--op, 0.25);
+  animation:
+    orb-drift var(--dur, 20s) ease-in-out var(--delay, 0s) infinite alternate,
+    orb-pulse var(--pulse, 6s) ease-in-out var(--delay, 0s) infinite;
+  will-change: transform, opacity;
+}
+@keyframes orb-drift {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(var(--dx, 4vw), var(--dy, -8vh)) scale(var(--sc, 1.1)); }
+}
+@keyframes orb-pulse {
+  0%, 100% { opacity: var(--op, 0.25); }
+  50% { opacity: calc(var(--op, 0.25) * 0.45); }
+}
+
+body.ambient-paused .amb-tree-wrap,
+body.ambient-paused .fl,
+body.ambient-paused .leaf,
+body.ambient-paused .leaf-spin,
+body.ambient-paused .leaf-flip,
+body.ambient-paused .orb { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  #ambient { display: none; }
+}

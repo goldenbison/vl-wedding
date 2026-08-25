@@ -1,0 +1,23 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Wishes wall: anyone can read; anyone can create a well-formed wish;
+    // nobody can edit or delete from the client (moderate via the console).
+    match /wishes/{id} {
+      allow read: if true;
+      allow create: if
+        request.resource.data.keys().hasOnly(['name', 'message', 'createdAt']) &&
+        request.resource.data.name is string &&
+        request.resource.data.name.size() > 0 &&
+        request.resource.data.name.size() <= 60 &&
+        request.resource.data.message is string &&
+        request.resource.data.message.size() > 0 &&
+        request.resource.data.message.size() <= 600 &&
+        request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
