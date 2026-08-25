@@ -114,6 +114,8 @@ export function initMusic(btn, url = '') {
   let engine = null
   let audioEl = null
   let playing = false
+  let everPlayed = false
+  let userMuted = false
 
   // resolve the song file up-front so the open-tap starts the right source
   // (missing file → music box; hosting rewrites return HTML, not audio)
@@ -151,7 +153,9 @@ export function initMusic(btn, url = '') {
         await engine.start()
       }
       playing = true
+      everPlayed = true
       btn.dataset.playing = 'true'
+      cleanupKick()
     } catch (err) {
       console.warn('music blocked:', err)
     }
@@ -165,15 +169,37 @@ export function initMusic(btn, url = '') {
   }
 
   btn.addEventListener('click', () => {
-    if (playing) stop()
-    else play()
+    if (playing) {
+      userMuted = true
+      stop()
+    } else {
+      userMuted = false
+      play()
+    }
   })
 
+  // if autoplay was blocked (silent auto-open, no gesture yet), start on the
+  // guest's very first touch — unless they have already muted deliberately
+  function kick(e) {
+    if (everPlayed || userMuted) {
+      cleanupKick()
+      return
+    }
+    if (e.target && e.target.closest && e.target.closest('#musicToggle')) return
+    play()
+  }
+  function cleanupKick() {
+    window.removeEventListener('pointerdown', kick)
+    window.removeEventListener('keydown', kick)
+  }
+
   return {
-    // called right after the envelope is opened (a user gesture) —
+    // called right after the envelope is opened —
     // music always starts on; muting lasts only for the current visit
     autostart() {
       play()
+      window.addEventListener('pointerdown', kick)
+      window.addEventListener('keydown', kick)
     },
     stop,
   }

@@ -253,15 +253,24 @@ renderFooter()
 renderDock()
 
 const musicCtl = initMusic($('#musicToggle'), music.url)
-initGallery($('#gallery'))
-initWishes($('#wishes'), guestName)
 startAmbient()
+
+// the Firebase-backed sections load once the envelope is opening, so the
+// first paint on mobile stays light
+let dataStarted = false
+function startData() {
+  if (dataStarted) return
+  dataStarted = true
+  initGallery($('#gallery'))
+  initWishes($('#wishes'), guestName)
+}
 
 const site = $('#site')
 let landed = false
 
 // phase 1: make the site measurable (still invisible) and return the hero img
 function prepareSiteForLanding() {
+  startData()
   site.hidden = false
   window.scrollTo(0, 0)
   return $('#heroCard')

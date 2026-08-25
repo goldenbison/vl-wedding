@@ -3,7 +3,6 @@
 // Everything renders BEHIND the content — visible only in empty space.
 import { $, el } from './dom.js'
 
-const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches
 let started = false
 
 // oak-leaf shapes + golds sampled from the painting
@@ -45,7 +44,7 @@ const CANOPY_SPOTS = [
 ]
 
 export function startAmbient() {
-  if (REDUCED || started) return
+  if (started) return
   started = true
   const layer = $('#ambient')
 

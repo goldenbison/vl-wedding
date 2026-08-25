@@ -122,7 +122,3 @@ body.ambient-paused .leaf,
 body.ambient-paused .leaf-spin,
 body.ambient-paused .leaf-flip,
 body.ambient-paused .orb { animation-play-state: paused; }
-
-@media (prefers-reduced-motion: reduce) {
-  #ambient { display: none; }
-}

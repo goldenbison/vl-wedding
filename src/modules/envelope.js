@@ -4,8 +4,6 @@
 //   card presents itself → flies into the hero.
 import { $ } from './dom.js'
 
-const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches
-
 export function initEnvelope({ onOpen, onCardLanded }) {
   const scene = $('#envelopeScene')
   const flip = $('#envFlip')
@@ -14,7 +12,7 @@ export function initEnvelope({ onOpen, onCardLanded }) {
   let opened = false
 
   // gentle tilt following the pointer (desktop, before opening)
-  if (matchMedia('(hover: hover) and (pointer: fine)').matches && !REDUCED) {
+  if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
     scene.addEventListener('pointermove', (e) => {
       if (opened) return
       const dx = e.clientX / innerWidth - 0.5
@@ -61,14 +59,6 @@ export function initEnvelope({ onOpen, onCardLanded }) {
     opened = true
     scene.classList.add('scene-open')
     flip.style.transform = '' // release the pointer tilt; class takes over
-
-    if (REDUCED) {
-      onOpen()
-      onCardLanded()
-      scene.classList.add('scene-exit')
-      setTimeout(() => scene.remove(), 600)
-      return
-    }
 
     setTimeout(() => flip.classList.add('flipped'), 60)
     setTimeout(() => {
