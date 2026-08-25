@@ -174,6 +174,7 @@ export async function initGallery(root) {
   let swipeX = null
   let suppressClick = false
   grid.addEventListener('pointerdown', (e) => (swipeX = e.clientX))
+  grid.addEventListener('pointercancel', () => (swipeX = null))
   grid.addEventListener('pointerup', (e) => {
     if (swipeX == null) return
     const dx = e.clientX - swipeX

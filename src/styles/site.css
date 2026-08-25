@@ -250,6 +250,8 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
   transition: transform 0.23s ease, opacity 0.23s ease;
+  /* keep horizontal touch moves for our swipe; vertical stays with the page */
+  touch-action: pan-y;
 }
 @media (min-width: 700px) { .gallery-grid { grid-template-columns: repeat(3, 1fr); } }
 .gallery-grid.g-exit-l { transform: translateX(-46px); opacity: 0; }
