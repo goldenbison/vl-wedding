@@ -15,9 +15,10 @@
 .amb-tree-wrap {
   position: absolute;
   left: clamp(-150px, -7vw, -34px);
-  top: -10px;
-  /* svh: stable height that never resizes as mobile browser chrome hides */
-  height: 103svh;
+  /* rooted at the bottom of the screen on every page and resolution;
+     svh keeps it from resizing as mobile browser chrome hides */
+  bottom: -6px;
+  height: 104svh;
   aspect-ratio: 1100 / 1467;
   opacity: 0.8;
   transform-origin: 20% 8%;
@@ -35,7 +36,7 @@
   to { transform: rotate(0.3deg); }
 }
 @media (max-width: 700px) {
-  .amb-tree-wrap { height: 78svh; opacity: 0.6; left: -22vw; }
+  .amb-tree-wrap { height: 100svh; opacity: 0.6; left: -30vw; }
 }
 
 /* leaves wiggling on the painted canopy */

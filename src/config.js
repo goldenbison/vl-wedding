@@ -24,8 +24,8 @@ export const firebaseConfig = {
 
 // ---------------------------------------------------------------------------
 export const couple = {
-  groom: { kh: 'ខូវ ទី វិកទ័រ', en: 'Khov Ty Victor' },
-  bride: { kh: 'និត លុចលក្ខណា', en: 'Nith Luxlakna' },
+  groom: { kh: 'ខូវ ទី វិកទ័រ', en: 'Victor' },
+  bride: { kh: 'និត លុចលក្ខណា', en: 'Lakna' },
 }
 
 export const event = {
@@ -116,5 +116,5 @@ export const misc = {
   scrollHint: 'អូសចុះក្រោម',
   mapButton: 'បើកផែនទី Google Maps',
   gcalButton: 'រក្សាទុកកាលបរិច្ឆេទ',
-  footerLine: 'រៀបចំដោយក្តីស្រឡាញ់ · Victor & Luxlakna · 04.11.2026',
+  footerLine: 'រៀបចំដោយក្តីស្រឡាញ់ · Victor & Lakna · 04.11.2026',
 }
