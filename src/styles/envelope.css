@@ -273,9 +273,10 @@
      a filtered parent) */
   content: '';
   position: absolute;
-  inset: 21% 8.6% 21% 8.6%;
+  /* measured to the artwork's inner box lines (the crop is asymmetric) */
+  inset: 28% 9.6% 11% 11.4%;
   background: rgba(14, 16, 58, 0.62);
-  border-radius: 3px;
+  border-radius: 2px;
   box-shadow: inset 0 1px 0 rgba(242, 227, 187, 0.08);
   z-index: -1;
 }
