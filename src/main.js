@@ -54,7 +54,7 @@ function renderHero() {
   $('#home').innerHTML = `
     <div class="hero-inner">
       <div class="hero-card-wrap">
-        <figure class="art-card">
+        <figure class="art-card art-matted">
           <img id="heroCard" src="${esc(art.invite.src)}" alt="${esc(art.invite.alt)}" draggable="false" />
         </figure>
       </div>

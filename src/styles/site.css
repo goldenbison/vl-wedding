@@ -51,6 +51,13 @@
   pointer-events: none;
 }
 
+/* the letter matted on the printed blue damask, as inside the envelope */
+.art-card.art-matted {
+  background: #1a2152 url('/assets/card/cover-back.jpg') center / cover;
+  padding: clamp(10px, 2.6vw, 24px);
+}
+.art-card.art-matted img { border-radius: 3px; }
+
 /* narrow panels (agenda, thanks) sit in a slimmer column */
 .section-inner.narrow { max-width: 480px; }
 
