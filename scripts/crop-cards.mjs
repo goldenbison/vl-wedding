@@ -18,7 +18,7 @@ const S = {
 
 // { out, src, box: [fx0, fy0, fx1, fy1], width }
 const JOBS = [
-  { out: 'cover-front.jpg', src: S.cover, box: [0.069, 0.1096, 0.481, 0.8304], width: 1300 },
+  { out: 'cover-front.jpg', src: S.cover, box: [0.0755, 0.1096, 0.4875, 0.8304], width: 1300 },
   { out: 'cover-back.jpg', src: S.cover, box: [0.515, 0.1096, 0.928, 0.8304], width: 1300 },
   { out: 'badge.png', src: S.cover, box: [0.6425, 0.315, 0.8025, 0.598], width: 460, png: true },
   { out: 'panel-thanks.jpg', src: S.trifold, box: [0.0675, 0.0955, 0.2685, 0.7775], width: 900 },

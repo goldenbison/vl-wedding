@@ -53,7 +53,7 @@ export const art = {
   thanks: { src: '/assets/card/panel-thanks.jpg', alt: 'សេចក្តីថ្លែងអំណរគុណ និងសេចក្តីសុំអភ័យទោស' },
   mapCard: { src: '/assets/card/map-card.jpg', alt: 'ផែនទីទៅសណ្ឋាគារ សុខា ភ្នំពេញ (ជ្រោយចង្វារ)' },
   guestFrame: { src: '/assets/card/guest-frame.png', alt: '' },
-  guestBox: { left: 23.8, top: 72.05, width: 53.2, height: 5.2 },
+  guestBox: { left: 22.2, top: 72.05, width: 53.2, height: 5.2 },
 }
 
 // ---------------------------------------------------------------------------
