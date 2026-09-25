@@ -4,7 +4,7 @@
 //   card presents itself → flies into the hero.
 import { $ } from './dom.js'
 
-export function initEnvelope({ onStart, onOpen, onCardLanded }) {
+export function initEnvelope({ onStart, onOpen, onCardLanded, autoOpen = true }) {
   const scene = $('#envelopeScene')
   const flip = $('#envFlip')
   const card = $('#envCard')
@@ -77,7 +77,7 @@ export function initEnvelope({ onStart, onOpen, onCardLanded }) {
   // …and the letter opens itself after a short moment — counted from when
   // the page has fully loaded, so slow connections still get the full pause.
   // (?hold=1 disables only the auto-open, for design inspection)
-  if (!new URLSearchParams(location.search).has('hold')) {
+  if (autoOpen && !new URLSearchParams(location.search).has('hold')) {
     const arm = () => setTimeout(open, 5000)
     if (document.readyState === 'complete') arm()
     else window.addEventListener('load', arm, { once: true })

@@ -56,6 +56,20 @@ export function startAmbient() {
   if (started) return
   started = true
   const layer = $('#ambient')
+  // Messenger/Safari can change even their "small" viewport when toolbars
+  // collapse. Freeze the painting in pixels; recalculate only for a new width.
+  let sceneWidth = document.documentElement.clientWidth
+  const sizeScene = () => {
+    document.documentElement.style.setProperty('--scene-height', `${window.innerHeight}px`)
+    document.documentElement.style.setProperty('--background-height', `${Math.max(window.innerHeight, window.screen.height)}px`)
+  }
+  sizeScene()
+  window.addEventListener('resize', () => {
+    const width = document.documentElement.clientWidth
+    if (width === sceneWidth) return
+    sceneWidth = width
+    sizeScene()
+  }, { passive: true })
 
   // --- the oak painting + rustling overlay ---
   const rustle = CANOPY_SPOTS.map(([x, y]) => {

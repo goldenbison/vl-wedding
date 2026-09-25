@@ -309,6 +309,7 @@ function finishReveal() {
 }
 
 initEnvelope({
+  autoOpen: Boolean(guestName),
   onStart: () => musicCtl.autostart(),
   onOpen() {
     // watchdog: even if the landing animation stalls (e.g. the tab is

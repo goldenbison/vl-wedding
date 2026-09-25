@@ -107,7 +107,7 @@ export const music = {
 // ---------------------------------------------------------------------------
 export const misc = {
   // shown when the link has no ?to= name of its own
-  defaultGuest: 'លោក និត លុចវីរៈបុត្រ',
+  defaultGuest: '',
   guestPrefix: 'ជូនចំពោះ',
   guestLabel: 'សូមគោរពអញ្ជើញ',
   openButton: 'បើកលិខិតអញ្ជើញ',
