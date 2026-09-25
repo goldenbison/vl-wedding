@@ -116,6 +116,7 @@ export function initMusic(btn, url = '') {
   let playing = false
   let everPlayed = false
   let userMuted = false
+  let starting = false
 
   // resolve the song file up-front so the open-tap starts the right source
   // (missing file → music box; hosting rewrites return HTML, not audio)
@@ -134,6 +135,8 @@ export function initMusic(btn, url = '') {
   btn.dataset.playing = 'false'
 
   async function play() {
+    if (playing || starting || userMuted) return
+    starting = true
     try {
       if (url) {
         if (!audioEl) {
@@ -144,6 +147,7 @@ export function initMusic(btn, url = '') {
             // file missing → fall back to the music box
             url = ''
             audioEl = null
+            starting = false
             play()
           }, { once: true })
         }
@@ -158,6 +162,8 @@ export function initMusic(btn, url = '') {
       cleanupKick()
     } catch (err) {
       console.warn('music blocked:', err)
+    } finally {
+      starting = false
     }
   }
 
@@ -190,6 +196,8 @@ export function initMusic(btn, url = '') {
   }
   function cleanupKick() {
     window.removeEventListener('pointerdown', kick)
+    window.removeEventListener('touchend', kick)
+    window.removeEventListener('click', kick)
     window.removeEventListener('keydown', kick)
   }
 
@@ -197,9 +205,11 @@ export function initMusic(btn, url = '') {
     // called right after the envelope is opened —
     // music always starts on; muting lasts only for the current visit
     autostart() {
-      play()
       window.addEventListener('pointerdown', kick)
+      window.addEventListener('touchend', kick)
+      window.addEventListener('click', kick)
       window.addEventListener('keydown', kick)
+      play()
     },
     stop,
   }

@@ -11,9 +11,10 @@ import { initCountdown } from './modules/countdown.js'
 import { gcalHref } from './modules/calendar.js'
 import { initGallery } from './modules/gallery.js'
 import { initWishes } from './modules/wishes.js'
+import { fitGuestNames } from './modules/guest-name.js'
 
 const params = new URLSearchParams(window.location.search)
-const guestName =
+let guestName =
   (params.get('to') || params.get('guest') || '').trim().slice(0, 60) || misc.defaultGuest
 
 // a reload always starts at the sealed envelope, never at a restored scroll
@@ -39,7 +40,7 @@ function renderEnvelope() {
   g.style.top = `${box.top}%`
   g.style.width = `${box.width}%`
   g.style.height = `${box.height}%`
-  g.textContent = guestName || ''
+  g.innerHTML = `<span>${esc(guestName)}</span>`
 
   const openBtn = $('#envOpenBtn')
   openBtn.textContent = misc.openButton
@@ -62,7 +63,7 @@ function renderHero() {
       <div class="hero-guest-block">
         <div class="hero-guest-frame">
           <img src="${esc(art.guestFrame.src)}" alt="${esc(misc.guestLabel)}" draggable="false" />
-          <span class="hero-guest-name">${esc(guestName)}</span>
+          <span class="hero-guest-name"><span>${esc(guestName)}</span></span>
         </div>
       </div>` : ''}
       <div class="countdown" id="countdown"></div>
@@ -241,6 +242,22 @@ function setupMusicToggleVisibility() {
 // ---------------------------------------------------------------------------
 // Boot
 // ---------------------------------------------------------------------------
+async function boot() {
+if (location.pathname.startsWith('/i/')) {
+  const id = location.pathname.slice(3).replace(/\/$/, '')
+  try {
+    if (!/^[A-Za-z0-9_-]{12}$/.test(id)) throw new Error('This invitation link is invalid. Please ask the couple for your link.')
+    const response = await fetch(`/api/invitations?id=${encodeURIComponent(id)}`)
+    if (!response.ok) throw new Error(response.status === 404 ? 'This invitation could not be found. Please check your link with the couple.' : 'Your invitation could not load. Please try again in a moment.')
+    const data = await response.json()
+    if (typeof data.name !== 'string' || !data.name) throw new Error('This invitation could not be loaded.')
+    guestName = data.name
+  } catch (error) {
+    document.body.classList.remove('is-locked')
+    $('#envelopeScene').innerHTML = `<div style="max-width:420px;padding:32px;text-align:center"><h1 style="font-size:24px">Your invitation</h1><p>${esc(error.message)}</p><button type="button" onclick="location.reload()" style="padding:16px;text-decoration:underline">Try again</button></div>`
+    return
+  }
+}
 renderEnvelope()
 renderHero()
 renderProcession()
@@ -251,6 +268,7 @@ renderWishes()
 renderThanks()
 renderFooter()
 renderDock()
+fitGuestNames()
 
 const musicCtl = initMusic($('#musicToggle'), music.url)
 startAmbient()
@@ -292,8 +310,8 @@ function finishReveal() {
 }
 
 initEnvelope({
+  onStart: () => musicCtl.autostart(),
   onOpen() {
-    musicCtl.autostart()
     // watchdog: even if the landing animation stalls (e.g. the tab is
     // backgrounded mid-flight), the site must still reveal
     setTimeout(finishReveal, 4500)
@@ -309,3 +327,5 @@ if (params.has('skip')) {
   prepareSiteForLanding()
   finishReveal()
 }
+}
+boot()

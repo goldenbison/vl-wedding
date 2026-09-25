@@ -53,6 +53,12 @@
   padding: 1rem;
 }
 
+@media (max-width: 699px), (max-height: 500px) {
+  .env-stage { gap: 1.5rem; padding: 1rem; }
+  .env-stage .env-flip { width: min(74vw, calc(100svh - 170px), 420px); }
+  .env-stage .env-open-btn { width: min(78vw, 340px); min-height: 44px; }
+}
+
 /* --------------------------------------------------------------------------
    3D flip rig — NOTE: no `filter` anywhere inside .env-flip (it breaks
    3D hit-testing); shadows are box-shadows or the sibling .env-shadow.
@@ -124,16 +130,17 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding-top: 5px;
+  padding: 0 3%;
   font-family: var(--font-kh);
   font-weight: 700;
   font-size: 4.1cqw;
-  line-height: 1;
+  line-height: 1.55;
   color: #dfb469;
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
   white-space: nowrap;
   pointer-events: none;
 }
+.env-guest-name > span, .hero-guest-name > span { flex: none; display: block; }
 
 /* ---- back: the printed gatefold ------------------------------------------ */
 .env-side-back {

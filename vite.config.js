@@ -6,6 +6,7 @@ export default defineConfig({
     strictPort: true,
   },
   build: {
+    rollupOptions: { input: { invitation: 'index.html', admin: 'admin.html' } },
     outDir: 'dist',
     assetsInlineLimit: 8192,
   },

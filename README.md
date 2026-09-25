@@ -77,6 +77,24 @@ just like the physical card.
 
 ## Notes
 
+### Guest link admin (Netlify)
+
+Visit `/admin` to enter guest names, save invitations, search the saved list,
+and copy short links such as `https://victorlakna.com/i/AbCdEf123456`.
+Links are stored in a site-wide Netlify Blobs store and survive redeploys.
+Anyone with a guest's link can view that invitation; the guest list and creation
+endpoint require the admin password. Passwords stay in memory only in the admin browser.
+
+Before deploying, set a long, unique `ADMIN_PASSWORD` in Netlify → Project
+configuration → Environment variables (available to Functions), then redeploy.
+Never add this password to source code or prefix it with `VITE_`.
+Use `netlify dev` for the complete local API and storage experience; plain
+`npm run dev` previews the UI but does not run Netlify Functions.
+The usual Git-connected Netlify build deploys the functions together with the site.
+Existing `?to=` and `?guest=` links continue to work.
+
+Run `node --test tests/invitations.test.mjs` to check API access control and link resolution.
+
 - Music starts only after the guest taps open (browsers require a gesture); the on/off
   choice is remembered per browser.
 - Tap any panel to zoom it (lightbox); pinch-zoom also works.

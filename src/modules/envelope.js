@@ -4,7 +4,7 @@
 //   card presents itself → flies into the hero.
 import { $ } from './dom.js'
 
-export function initEnvelope({ onOpen, onCardLanded }) {
+export function initEnvelope({ onStart, onOpen, onCardLanded }) {
   const scene = $('#envelopeScene')
   const flip = $('#envFlip')
   const card = $('#envCard')
@@ -57,6 +57,7 @@ export function initEnvelope({ onOpen, onCardLanded }) {
   function open() {
     if (opened || !scene.isConnected) return
     opened = true
+    onStart?.() // keep audio playback in the opening tap's user activation
     scene.classList.add('scene-open')
     flip.style.transform = '' // release the pointer tilt; class takes over
 
