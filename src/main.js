@@ -43,8 +43,7 @@ function renderEnvelope() {
   g.innerHTML = `<span>${esc(guestName)}</span>`
 
   const openBtn = $('#envOpenBtn')
-  openBtn.textContent = misc.openButton
-  openBtn.dataset.label = misc.openButton
+  openBtn.innerHTML = `<span class="env-open-frame"><span class="env-open-label"><span>${esc(misc.openButton)}</span></span></span>`
   sprinkleStars($('.env-stars'), 16)
 }
 

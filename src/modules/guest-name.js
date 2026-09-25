@@ -1,6 +1,6 @@
 // Measure after fonts load and whenever a frame changes size (including reveal).
 export function fitGuestNames() {
-  const boxes = [...document.querySelectorAll('.env-guest-name, .hero-guest-name')]
+  const boxes = [...document.querySelectorAll('.env-guest-name, .hero-guest-name, .env-open-label')]
   function fit(box) {
     const label = box.firstElementChild
     const style = getComputedStyle(box)

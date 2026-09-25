@@ -130,7 +130,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 0 3%;
+  padding: 0 1.2%;
   font-family: var(--font-kh);
   font-weight: 700;
   font-size: 4.1cqw;
@@ -140,7 +140,7 @@
   white-space: nowrap;
   pointer-events: none;
 }
-.env-guest-name > span, .hero-guest-name > span { flex: none; display: block; }
+.env-guest-name > span, .hero-guest-name > span, .env-open-label > span { flex: none; display: block; }
 
 /* ---- back: the printed gatefold ------------------------------------------ */
 .env-side-back {
@@ -265,40 +265,49 @@
   position: relative;
   z-index: 6;
   width: min(370px, 84vw);
-  aspect-ratio: 900 / 115;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
   border: 0;
-  background: url('/assets/card/name-frame.png') center / contain no-repeat;
+  background: none;
   color: transparent;
   font-family: var(--font-moul);
   font-size: clamp(0.85rem, 3.4vw, 1rem);
   filter: drop-shadow(0 1px 3px rgba(4, 6, 20, 0.85)) drop-shadow(0 8px 20px rgba(0, 0, 0, 0.45));
   transition: transform 0.3s ease, filter 0.3s ease;
 }
-.env-open-btn::before {
+.env-open-frame {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 900 / 115;
+  background: url('/assets/card/name-frame.png') center / 100% 100% no-repeat;
+}
+.env-open-frame::before {
   /* glass panel inside the printed frame, like the guest name box —
      plain translucency (no backdrop-filter: Safari misplaces it under
      a filtered parent) */
   content: '';
   position: absolute;
   /* measured to the artwork's inner box lines (the crop is asymmetric) */
-  inset: 28% 9.6% 11% 11.4%;
+  inset: 29% 8.3% 2% 13.2%;
   background: rgba(14, 16, 58, 0.62);
   border-radius: 2px;
   box-shadow: inset 0 1px 0 rgba(242, 227, 187, 0.08);
-  z-index: -1;
+  z-index: 0;
 }
-.env-open-btn::after {
-  content: attr(data-label);
+.env-open-label {
   position: absolute;
-  inset: 0;
+  inset: 29% 8.3% 2% 13.2%;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-top: 11px;
-  background: var(--gold-grad);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  padding: 0 2%;
+  line-height: 1.7;
+  white-space: nowrap;
+  color: var(--gold-300);
+  z-index: 1;
 }
 .env-open-btn:hover {
   transform: translateY(-2px);
