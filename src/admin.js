@@ -3,8 +3,8 @@ let password = ''
 let items = []
 const linkFor = id => `${location.origin}/i/${id}`
 const status = message => { $('#status').textContent = message }
-async function api(method = 'GET', data) {
-  const response = await fetch('/api/invitations', { method, headers: { Authorization: `Bearer ${password}`, 'Content-Type': 'application/json' }, ...(data ? { body: JSON.stringify(data) } : {}) })
+async function api(method = 'GET', data, id) {
+  const response = await fetch(`/api/invitations${id ? `?id=${encodeURIComponent(id)}` : ''}`, { method, headers: { Authorization: `Bearer ${password}`, 'Content-Type': 'application/json' }, ...(data ? { body: JSON.stringify(data) } : {}) })
   if (!response.headers.get('content-type')?.includes('application/json')) throw new Error('The link service needs Netlify Functions. Deploy to Netlify or use netlify dev for local testing.')
   const result = await response.json()
   if (!response.ok) throw new Error(result.error || 'Could not load invitations.')
@@ -29,7 +29,31 @@ function render() {
     const button = document.createElement('button')
     button.type = 'button'; button.textContent = 'Copy'; button.className = 'quiet'
     button.addEventListener('click', () => copy(a.href))
-    info.append(name, a); row.append(info, button); $('#links').append(row)
+    button.disabled = Boolean(item.disabled)
+    const badge = document.createElement('span')
+    badge.className = `link-state${item.disabled ? ' disabled' : ''}`
+    badge.textContent = item.disabled ? 'Disabled' : 'Active'
+    const actions = document.createElement('div')
+    actions.className = 'link-actions'
+    const toggle = document.createElement('button')
+    toggle.type = 'button'; toggle.className = 'quiet'; toggle.textContent = item.disabled ? 'Enable' : 'Disable'
+    const remove = document.createElement('button')
+    remove.type = 'button'; remove.className = 'quiet danger'; remove.textContent = 'Delete'
+    async function change(method) {
+      if (method === 'DELETE' && !confirm(`Permanently delete the invitation for ${item.name}? This link will stop working and cannot be restored. Use Disable if you may want to enable it again.`)) return
+      actions.querySelectorAll('button').forEach(b => { b.disabled = true })
+      try {
+        const updated = await api(method, method === 'PATCH' ? { disabled: !item.disabled } : undefined, item.id)
+        items = method === 'DELETE' ? items.filter(x => x.id !== item.id) : items.map(x => x.id === item.id ? updated : x)
+        if ($('#result-url').value === linkFor(item.id)) $('#result').hidden = true
+        render()
+        status(method === 'DELETE' ? 'Invitation permanently deleted.' : updated.disabled ? 'Invitation disabled. You can enable it again at any time.' : 'Invitation enabled. The same link works again.')
+      } catch (error) { status(error.message); render() }
+    }
+    toggle.addEventListener('click', () => change('PATCH'))
+    remove.addEventListener('click', () => change('DELETE'))
+    actions.append(button, toggle, remove)
+    info.append(name, badge, a); row.append(info, actions); $('#links').append(row)
   }
 }
 async function refresh() { items = (await api()).items; render() }

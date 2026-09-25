@@ -15,6 +15,7 @@ return async function handler(request) {
     if (request.method === 'GET' && id) {
       if (!/^[A-Za-z0-9_-]{12}$/.test(id)) return json({ error: 'Invitation not found.' }, 404)
       const item = await openStore().get(id, { type: 'json' })
+      if (item?.disabled) return json({ error: 'This invitation is currently unavailable. Please contact the couple.' }, 410)
       return item ? json({ name: item.name }) : json({ error: 'Invitation not found.' }, 404)
     }
     const password = process.env.ADMIN_PASSWORD
@@ -27,16 +28,33 @@ return async function handler(request) {
       const items = []
       // Bound parallel reads even for a large guest list.
       for (let start = 0; start < blobs.length; start += 20) {
-        const batch = await Promise.all(blobs.slice(start, start + 20).map(async ({ key }) => ({ id: key, ...await store.get(key, { type: 'json' }) })))
-        items.push(...batch)
+        const batch = await Promise.all(blobs.slice(start, start + 20).map(async ({ key }) => {
+          const item = await store.get(key, { type: 'json' })
+          return item ? { id: key, ...item } : null
+        }))
+        items.push(...batch.filter(Boolean))
       }
       return json({ items: items.sort((a, b) => b.createdAt.localeCompare(a.createdAt)) })
     }
-    if (request.method !== 'POST') return json({ error: 'Method not allowed.' }, 405)
+    if (request.method === 'DELETE') {
+      if (!id || !/^[A-Za-z0-9_-]{12}$/.test(id)) return json({ error: 'Invalid invitation link.' }, 400)
+      await store.delete(id)
+      return json({ deleted: true, id })
+    }
+    if (!['POST', 'PATCH'].includes(request.method)) return json({ error: 'Method not allowed.' }, 405)
     const raw = await request.text()
     if (raw.length > 2048) return json({ error: 'Request is too large.' }, 413)
     let body
     try { body = JSON.parse(raw) } catch { return json({ error: 'Invalid request.' }, 400) }
+    if (request.method === 'PATCH') {
+      if (!id || !/^[A-Za-z0-9_-]{12}$/.test(id) || typeof body?.disabled !== 'boolean') return json({ error: 'Invalid invitation update.' }, 400)
+      const existing = await store.getWithMetadata(id, { type: 'json' })
+      if (!existing) return json({ error: 'Invitation not found.' }, 404)
+      const item = { ...existing.data, disabled: body.disabled }
+      const result = await store.setJSON(id, item, { onlyIfMatch: existing.etag })
+      if (!result.modified) return json({ error: 'This invitation changed. Refresh the list and try again.' }, 409)
+      return json({ id, ...item })
+    }
     const name = typeof body?.name === 'string' ? body.name.trim() : ''
     if (!name || name.length > 60 || /[\u0000-\u001f\u007f]/.test(name)) return json({ error: 'Enter a guest name of 1–60 characters.' }, 400)
     const item = { name, createdAt: new Date().toISOString() }

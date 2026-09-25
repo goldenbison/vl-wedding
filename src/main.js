@@ -247,7 +247,7 @@ if (location.pathname.startsWith('/i/')) {
   try {
     if (!/^[A-Za-z0-9_-]{12}$/.test(id)) throw new Error('This invitation link is invalid. Please ask the couple for your link.')
     const response = await fetch(`/api/invitations?id=${encodeURIComponent(id)}`)
-    if (!response.ok) throw new Error(response.status === 404 ? 'This invitation could not be found. Please check your link with the couple.' : 'Your invitation could not load. Please try again in a moment.')
+    if (!response.ok) throw new Error(response.status === 410 ? 'This invitation is currently unavailable. Please contact the couple.' : response.status === 404 ? 'This invitation could not be found. Please check your link with the couple.' : 'Your invitation could not load. Please try again in a moment.')
     const data = await response.json()
     if (typeof data.name !== 'string' || !data.name) throw new Error('This invitation could not be loaded.')
     guestName = data.name
