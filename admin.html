@@ -17,10 +17,20 @@
     </section>
     <div id="workspace" hidden>
       <section class="panel"><div class="heading"><h2>Create an invitation</h2><button id="logout" class="quiet" type="button">Sign out</button></div>
-        <form id="create"><label for="name">Guest name</label><input id="name" maxlength="60" placeholder="លោក និងលោកស្រី …" required autocomplete="off" /><p class="hint">Use the name and title exactly as they should appear on the invitation. Khmer and English are supported.</p><button>Create short link</button></form>
+        <form id="create"><label for="name">Guest name</label><input id="name" maxlength="60" placeholder="លោក និងលោកស្រី …" required autocomplete="off" /><p class="hint">Use the name and title exactly as they should appear on the invitation. Khmer and English are supported.</p>
+          <label for="gift">Invited to gift procession?</label><select id="gift"><option value="no">No</option><option value="yes">Yes</option></select>
+          <label for="group">Guest belongs to</label><select id="group"></select>
+          <button>Create short link</button></form>
         <div id="result" hidden><p>Ready to send</p><strong id="result-name"></strong><input id="result-url" readonly aria-label="Generated invitation link" /><button id="copy-result" type="button">Copy link</button><a id="open-result" target="_blank" rel="noopener">Preview invitation ↗</a></div>
       </section>
-      <section class="panel"><div class="heading"><h2>Saved invitations</h2><button id="refresh" class="quiet" type="button">Refresh</button></div><label for="search">Find a guest</label><input id="search" type="search" placeholder="Search by name" /><p id="count" class="hint"></p><ul id="links"></ul></section>
+      <section class="panel"><h2>Guest groups</h2><form id="add-group"><label for="new-group">Add a group</label><input id="new-group" maxlength="40" required placeholder="Group name" /><button>Add group</button></form></section>
+      <section class="panel"><h2>Import from Excel</h2><p class="hint">Upload an .xlsx workbook with columns Guest Name, Gift Procession (Yes/No), and Group. Blank procession = No; blank group = Unassigned. New groups are added automatically. Up to 1,000 guests per sheet. Review before importing.</p>
+        <button id="template" class="quiet" type="button">Download Excel template</button>
+        <label for="excel-file">Excel workbook (.xlsx, up to 5 MB)</label><input id="excel-file" type="file" accept=".xlsx" />
+        <label for="sheet" hidden id="sheet-label">Worksheet</label><select id="sheet" hidden></select>
+        <div id="import-review" hidden><p id="import-summary"></p><div class="table-scroll"><table><thead><tr><th>Guest</th><th>Procession</th><th>Group</th></tr></thead><tbody id="import-rows"></tbody></table></div><p id="import-detail" class="hint"></p><button id="import-confirm" type="button">Create invitation links</button></div>
+      </section>
+      <section class="panel"><div class="heading"><h2>Saved invitations</h2><button id="refresh" class="quiet" type="button">Refresh</button></div><label for="search">Find a guest</label><input id="search" type="search" placeholder="Search by name" /><label for="group-filter">Filter by group</label><select id="group-filter"></select><p id="count" class="hint"></p><ul id="links"></ul><button id="show-more" class="quiet" hidden type="button">Show more</button></section>
     </div>
     <p id="status" role="status" aria-live="polite"></p>
   </main>

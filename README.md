@@ -93,6 +93,18 @@ Use `netlify dev` for the complete local API and storage experience; plain
 The usual Git-connected Netlify build deploys the functions together with the site.
 Existing `?to=` and `?guest=` links continue to work.
 
+Guest settings include gift-procession attendance and an owner group. New invitations
+default to No and Unassigned. Existing invitations retain procession access until edited.
+Changing settings preserves the short link. Groups start with Victor, Keo, Pa Ty,
+Mak Thy, Pa Nith, and Mak Lux; additional groups can be added in admin.
+
+For bulk creation, download the Excel template in admin, replace its example rows,
+and upload an `.xlsx` workbook (up to 5 MB / 1,000 guests per worksheet). Columns are
+Guest Name, Gift Procession (Yes/No), and Group. Blank settings default to No and
+Unassigned. Select a worksheet, review the preview and duplicate warnings, then
+confirm. Failed rows can be retried in the same preview without duplicating saved rows.
+Re-uploading a workbook is a new import and can create duplicate guests.
+
 Run `node --test tests/invitations.test.mjs` to check API access control and link resolution.
 
 - Music starts only after the guest taps open (browsers require a gesture); the on/off

@@ -14,6 +14,7 @@ import { initWishes } from './modules/wishes.js'
 import { fitGuestNames } from './modules/guest-name.js'
 
 const params = new URLSearchParams(window.location.search)
+let giftProcession = true
 let guestName =
   (params.get('to') || params.get('guest') || '').trim().slice(0, 60) || misc.defaultGuest
 
@@ -251,6 +252,7 @@ if (location.pathname.startsWith('/i/')) {
     const data = await response.json()
     if (typeof data.name !== 'string' || !data.name) throw new Error('This invitation could not be loaded.')
     guestName = data.name
+    giftProcession = data.giftProcession !== false
   } catch (error) {
     document.body.classList.remove('is-locked')
     $('#envelopeScene').innerHTML = `<div style="max-width:420px;padding:32px;text-align:center"><h1 style="font-size:24px">Your invitation</h1><p>${esc(error.message)}</p><button type="button" onclick="location.reload()" style="padding:16px;text-decoration:underline">Try again</button></div>`
@@ -259,7 +261,8 @@ if (location.pathname.startsWith('/i/')) {
 }
 renderEnvelope()
 renderHero()
-renderProcession()
+if (giftProcession) renderProcession()
+else $('#procession').remove()
 renderAgenda()
 renderLocation()
 renderGallery()
@@ -278,8 +281,16 @@ let dataStarted = false
 function startData() {
   if (dataStarted) return
   dataStarted = true
-  initGallery($('#gallery'))
-  initWishes($('#wishes'), guestName)
+  // Load remote sections shortly before they enter view, not during the opening.
+  const observer = new IntersectionObserver(entries => {
+    for (const entry of entries) if (entry.isIntersecting) {
+      observer.unobserve(entry.target)
+      if (entry.target.id === 'gallery') initGallery(entry.target)
+      else initWishes(entry.target, guestName)
+    }
+  }, { rootMargin: '700px' })
+  observer.observe($('#gallery'))
+  observer.observe($('#wishes'))
 }
 
 const site = $('#site')

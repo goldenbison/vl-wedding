@@ -1,6 +1,19 @@
+import { DEFAULT_GROUPS, normalizeInvitation } from './modules/invitation-fields.js'
 const $ = selector => document.querySelector(selector)
 let password = ''
 let items = []
+let groups = [...DEFAULT_GROUPS]
+let visibleLimit = 50
+function groupOptions(select, all = false) {
+  const previous = select.value
+  select.replaceChildren(...(all ? [new Option('All groups', '')] : []), ...groups.map(g => new Option(g, g)))
+  select.value = [...select.options].some(o => o.value === previous) ? previous : all ? '' : 'Unassigned'
+}
+function renderGroups() { groupOptions($('#group')); groupOptions($('#group-filter'), true) }
+function remember(item) {
+  if (!items.some(x => x.id === item.id)) items.unshift(normalizeInvitation(item))
+  groups = [...new Set([...groups, item.group || 'Unassigned'])]
+}
 const linkFor = id => `${location.origin}/i/${id}`
 const status = message => { $('#status').textContent = message }
 async function api(method = 'GET', data, id) {
@@ -16,10 +29,11 @@ async function copy(url) {
 }
 function render() {
   const query = $('#search').value.trim().toLocaleLowerCase()
-  const filtered = items.filter(item => item.name.toLocaleLowerCase().includes(query))
+  const filtered = items.filter(item => item.name.toLocaleLowerCase().includes(query) && (!$('#group-filter').value || item.group === $('#group-filter').value))
   $('#links').replaceChildren()
-  $('#count').textContent = `${filtered.length} of ${items.length} invitations`
-  for (const item of filtered) {
+  $('#count').textContent = `${filtered.length} of ${items.length} invitations · showing ${Math.min(visibleLimit, filtered.length)}`
+  $('#show-more').hidden = filtered.length <= visibleLimit
+  for (const item of filtered.slice(0, visibleLimit)) {
     const row = document.createElement('li')
     const info = document.createElement('div')
     const name = document.createElement('strong')
@@ -53,10 +67,27 @@ function render() {
     toggle.addEventListener('click', () => change('PATCH'))
     remove.addEventListener('click', () => change('DELETE'))
     actions.append(button, toggle, remove)
-    info.append(name, badge, a); row.append(info, actions); $('#links').append(row)
+    const settings = document.createElement('div')
+    settings.className = 'guest-settings'
+    const groupLabel = document.createElement('label'); groupLabel.textContent = 'Belongs to'
+    const owner = document.createElement('select'); groupOptions(owner); owner.value = item.group
+    groupLabel.append(owner)
+    const giftLabel = document.createElement('label'); giftLabel.textContent = 'Gift procession'
+    const gift = document.createElement('select'); gift.append(new Option('No', 'no'), new Option('Yes', 'yes')); gift.value = item.giftProcession ? 'yes' : 'no'
+    giftLabel.append(gift)
+    const save = document.createElement('button'); save.type = 'button'; save.className = 'quiet'; save.textContent = 'Save details'
+    save.addEventListener('click', async () => {
+      save.disabled = true
+      try {
+        const updated = await api('PATCH', { group: owner.value, giftProcession: gift.value === 'yes' }, item.id)
+        items = items.map(x => x.id === item.id ? updated : x); render(); status('Guest details saved. The existing link uses the new settings.')
+      } catch (error) { status(error.message); save.disabled = false }
+    })
+    settings.append(groupLabel, giftLabel, save)
+    info.append(name, badge, a, settings); row.append(info, actions); $('#links').append(row)
   }
 }
-async function refresh() { items = (await api()).items; render() }
+async function refresh() { const data = await api(); items = data.items.map(normalizeInvitation); groups = data.groups || [...DEFAULT_GROUPS]; renderGroups(); render() }
 $('#login').addEventListener('submit', async event => {
   event.preventDefault(); const button = event.submitter; button.disabled = true; status('Signing in…')
   password = $('#password').value
@@ -67,8 +98,8 @@ $('#login').addEventListener('submit', async event => {
 $('#create').addEventListener('submit', async event => {
   event.preventDefault(); const button = event.submitter; button.disabled = true; status('Creating invitation…')
   try {
-    const item = await api('POST', { name: $('#name').value })
-    items.unshift(item); render()
+    const item = await api('POST', { name: $('#name').value, giftProcession: $('#gift').value === 'yes', group: $('#group').value })
+    remember(item); render()
     $('#result-name').textContent = item.name; $('#result-url').value = linkFor(item.id); $('#open-result').href = linkFor(item.id)
     $('#result').hidden = false; $('#name').value = ''; status('Invitation saved. This link is ready to send.')
   } catch (error) { status(error.message) }
@@ -76,8 +107,23 @@ $('#create').addEventListener('submit', async event => {
 })
 $('#copy-result').addEventListener('click', () => copy($('#result-url').value))
 $('#search').addEventListener('input', render)
+$('#group-filter').addEventListener('change', () => { visibleLimit = 50; render() })
+$('#show-more').addEventListener('click', () => { visibleLimit += 50; render() })
+$('#add-group').addEventListener('submit', async event => {
+  event.preventDefault(); event.submitter.disabled = true
+  try { const result = await api('POST', { action: 'addGroup', group: $('#new-group').value }); groups = [...new Set([...groups, result.group])]; renderGroups(); render(); $('#new-group').value = ''; status('Group added.') }
+  catch (error) { status(error.message) }
+  finally { event.submitter.disabled = false }
+})
+let excelModule
+async function excel() { return excelModule ||= import('./modules/admin-import.js').then(({ initImport }) => initImport({ api, status, onItem: remember, onComplete: () => { renderGroups(); render() }, getItems: () => items })) }
+$('#excel-file').addEventListener('change', async () => { try { (await excel()).load($('#excel-file').files[0]) } catch (error) { status(error.message) } })
+$('#template').addEventListener('click', async () => { try { await (await excel()).template() } catch (error) { status(error.message) } })
+renderGroups()
 $('#refresh').addEventListener('click', async () => { try { await refresh(); status('Invitations refreshed.') } catch (error) { status(error.message) } })
 $('#logout').addEventListener('click', () => {
+  if (excelModule) excelModule.then(module => module.reset())
+  groups = [...DEFAULT_GROUPS]; renderGroups()
   password = ''; items = []; $('#links').replaceChildren(); $('#result').hidden = true; $('#result-url').value = ''; $('#result-name').textContent = ''; $('#open-result').removeAttribute('href'); $('#name').value = ''
   $('#workspace').hidden = true; $('#login-panel').hidden = false; status('Signed out.'); $('#password').focus()
 })

@@ -1,6 +1,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { createHandler } from '../netlify/functions/invitations.mjs'
+import { parseGuestRows, DEFAULT_GROUPS } from '../src/modules/invitation-fields.js'
 
 test('private creation/listing and public cross-session resolution', async () => {
   const records = new Map()
@@ -28,7 +29,26 @@ test('private creation/listing and public cross-session resolution', async () =>
     assert.match(created.id, /^[A-Za-z0-9_-]{12}$/)
     // A fresh handler represents a different visitor/function invocation.
     const guestResponse = await createHandler(() => store)(request('GET', undefined, false, `?id=${created.id}`))
-    assert.deepEqual(await guestResponse.json(), { name: 'លោក និងលោកស្រី សុខា' })
+    assert.deepEqual(await guestResponse.json(), { name: 'លោក និងលោកស្រី សុខា', giftProcession: false })
+    assert.equal(created.group, 'Unassigned')
+    assert.equal((await handler(request('PATCH', { giftProcession: 'no' }, true, `?id=${created.id}`))).status, 400)
+    assert.equal((await handler(request('PATCH', { giftProcession: true, group: 'Keo' }, true, `?id=${created.id}`))).status, 200)
+    assert.deepEqual(await (await handler(request('GET', undefined, false, `?id=${created.id}`))).json(), { name: created.name, giftProcession: true })
+    // Existing pre-feature invitations keep their procession access.
+    records.set('oldGuest1234', { name: 'Legacy guest', createdAt: '2026-01-01' })
+    assert.equal((await (await handler(request('GET', undefined, false, '?id=oldGuest1234'))).json()).giftProcession, true)
+    records.delete('oldGuest1234')
+    assert.equal((await handler(request('POST', { action: 'addGroup', group: 'Friends' }))).status, 401)
+    assert.equal((await handler(request('POST', { action: 'addGroup', group: 'Friends' }, true))).status, 201)
+    const grouped = await (await handler(request('GET', undefined, true))).json()
+    assert.ok(DEFAULT_GROUPS.every(g => grouped.groups.includes(g)))
+    assert.ok(grouped.groups.includes('Friends'))
+    assert.equal(grouped.items.length, 1)
+    const imported = { requestId: 'importRow123', name: 'Imported guest', giftProcession: false, group: 'Victor' }
+    assert.equal((await handler(request('POST', imported, true))).status, 201)
+    assert.equal((await handler(request('POST', imported, true))).status, 200)
+    assert.equal((await handler(request('POST', { ...imported, name: 'Different guest' }, true))).status, 409)
+    records.delete(imported.requestId)
     assert.equal((await handler(request('GET', undefined, false, '?id=missing'))).status, 404)
     assert.equal((await handler(request('GET', undefined, false, '?id=abcdefghijkl'))).status, 404)
     const list = await (await handler(request('GET', undefined, true))).json()
@@ -52,4 +72,26 @@ test('private creation/listing and public cross-session resolution', async () =>
     delete process.env.ADMIN_PASSWORD
     assert.equal((await handler(request('POST', { name: 'Guest' }, true))).status, 503)
   } finally { if (previous === undefined) delete process.env.ADMIN_PASSWORD; else process.env.ADMIN_PASSWORD = previous }
+})
+
+test('Excel validation preserves Khmer names and rejects malformed rows', () => {
+  assert.deepEqual(parseGuestRows([['Guest Name', 'Gift Procession', 'Group'], ['សុខា', 'Yes', 'Victor'], ['Guest', '', ''], [null, null, null]]), [
+    { name: 'សុខា', giftProcession: true, group: 'Victor' }, { name: 'Guest', giftProcession: false, group: 'Unassigned' },
+  ])
+  assert.throws(() => parseGuestRows([['Guest Name', 'Gift Procession'], ['A', 'maybe']]), /Row 2/)
+  assert.throws(() => parseGuestRows([['Other'], ['A']]), /Guest Name/)
+  assert.throws(() => parseGuestRows([['Guest Name'], ['x'.repeat(61)]]), /Row 2/)
+})
+
+test('real Excel workbook round-trips through writer and reader', async () => {
+  const { default: write } = await import('write-excel-file/node')
+  const { default: read } = await import('read-excel-file/node')
+  const rows = [['Guest Name', 'Gift Procession', 'Group'], ['សុខា', 'Yes', 'Victor'], ['Guest', 'No', '']]
+  const workbook = await write(rows.map(row => row.map(value => ({ type: String, value })))).toBuffer()
+  const sheets = await read(workbook)
+  assert.equal(sheets.length, 1)
+  assert.deepEqual(parseGuestRows(sheets[0].data), [
+    { name: 'សុខា', giftProcession: true, group: 'Victor' },
+    { name: 'Guest', giftProcession: false, group: 'Unassigned' },
+  ])
 })

@@ -28,26 +28,27 @@ async function loadFromFirebase() {
   if (!api) return null
   const { storage, st } = api
 
-  const jobs = []
+  const items = []
   const collect = (itemRef, album) =>
-    jobs.push(
-      st.getDownloadURL(itemRef).then((url) => ({
+    items.push({
         type: isVideoName(itemRef.name) ? 'video' : 'image',
-        src: url,
+        // Gallery objects already allow public reads. Use their media endpoint
+        // directly instead of making a metadata request for every photo.
+        src: `https://firebasestorage.googleapis.com/v0/b/${itemRef.bucket}/o/${encodeURIComponent(itemRef.fullPath)}?alt=media`,
         album,
         caption: album ? labelFor(album) : '',
         name: itemRef.name,
-      }))
-    )
+      })
 
   const root = await st.listAll(st.ref(storage, cfg.storagePath))
   root.items.forEach((r) => collect(r, ''))
-  const subs = await Promise.all(
+  const subs = await Promise.allSettled(
     root.prefixes.map((p) => st.listAll(p).then((res) => ({ name: p.name, res })))
   )
-  for (const { name, res } of subs) res.items.forEach((r) => collect(r, name))
-
-  const items = await Promise.all(jobs)
+  for (const sub of subs) {
+    if (sub.status === 'fulfilled') sub.value.res.items.forEach(r => collect(r, sub.value.name))
+    else console.warn('gallery: album unavailable:', sub.reason)
+  }
   return items.length ? items : null
 }
 
@@ -114,7 +115,7 @@ export async function initGallery(root) {
   function paint() {
     const items = pageSlice()
     grid.innerHTML = items.length
-      ? items.map((it, i) => tileMarkup(it, page * PAGE + i)).join('')
+      ? items.map((it, i) => tileMarkup(it, Math.min(page * PAGE, Math.max(0, pool.length - PAGE)) + i)).join('')
       : `<div class="g-empty">មិនទាន់មានរូបភាពនៅឡើយទេ</div>`
     preload(items)
     preloadUpcoming()

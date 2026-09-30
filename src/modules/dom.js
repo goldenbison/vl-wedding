@@ -54,7 +54,7 @@ export function paperCard(innerHTML, extraClass = '') {
 export function artCard({ src, alt }, extraClass = '') {
   return `
   <figure class="art-card reveal ${extraClass}">
-    <img src="${esc(src)}" alt="${esc(alt)}" loading="lazy" draggable="false" />
+    <img src="${esc(src)}" alt="${esc(alt)}" loading="lazy" decoding="async" draggable="false" />
   </figure>`
 }
 
