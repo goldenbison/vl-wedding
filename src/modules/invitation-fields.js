@@ -1,6 +1,7 @@
+import { normalizeKhmerName } from './khmer-name.js'
 export const DEFAULT_GROUPS = ['Unassigned', 'Victor', 'Keo', 'Pa Ty', 'Mak Thy', 'Pa Nith', 'Mak Lux']
 export const validGroup = value => typeof value === 'string' && value.trim().length > 0 && value.trim().length <= 40 && !/[\u0000-\u001f\u007f]/.test(value)
-export const normalizeInvitation = item => ({ ...item, giftProcession: item.giftProcession !== false, group: item.group || 'Unassigned' })
+export const normalizeInvitation = item => ({ ...item, name: normalizeKhmerName(item.name), giftProcession: item.giftProcession !== false, group: item.group || 'Unassigned' })
 
 // Pure validation shared with Excel preview; never silently guess malformed yes/no values.
 export function parseGuestRows(rows) {
@@ -13,7 +14,7 @@ export function parseGuestRows(rows) {
   const result = []
   for (let i = 1; i < rows.length; i++) {
     if (rows[i].every(x => x == null || String(x).trim() === '')) continue
-    const name = String(rows[i][nameCol] ?? '').trim()
+    const name = normalizeKhmerName(String(rows[i][nameCol] ?? '').trim())
     const group = String(rows[i][groupCol] ?? '').trim() || 'Unassigned'
     const gift = String(rows[i][giftCol] ?? '').trim().toLowerCase()
     if (!name || name.length > 60 || /[\u0000-\u001f\u007f]/.test(name)) throw new Error(`Row ${i + 1}: guest name must be 1–60 characters.`)

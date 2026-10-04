@@ -12,6 +12,7 @@ import { gcalHref } from './modules/calendar.js'
 import { initGallery } from './modules/gallery.js'
 import { initWishes } from './modules/wishes.js'
 import { fitGuestNames } from './modules/guest-name.js'
+import { normalizeKhmerName } from './modules/khmer-name.js'
 
 const params = new URLSearchParams(window.location.search)
 let giftProcession = true
@@ -259,6 +260,7 @@ if (location.pathname.startsWith('/i/')) {
     return
   }
 }
+guestName = normalizeKhmerName(guestName)
 renderEnvelope()
 renderHero()
 if (giftProcession) renderProcession()

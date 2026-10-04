@@ -3,6 +3,7 @@ import assert from 'node:assert/strict'
 import { createHandler } from '../netlify/functions/invitations.mjs'
 import { parseGuestRows, DEFAULT_GROUPS } from '../src/modules/invitation-fields.js'
 import { sessionCookie, validSession } from '../netlify/lib/admin-session.mjs'
+import { normalizeKhmerName } from '../src/modules/khmer-name.js'
 
 test('private creation/listing and public cross-session resolution', async () => {
   const records = new Map()
@@ -45,7 +46,8 @@ test('private creation/listing and public cross-session resolution', async () =>
     assert.equal((await handler(request('PATCH', { giftProcession: true, group: 'Keo' }, true, `?id=${created.id}`))).status, 200)
     assert.deepEqual(await (await handler(request('GET', undefined, false, `?id=${created.id}`))).json(), { name: created.name, giftProcession: true })
     // Existing pre-feature invitations keep their procession access.
-    records.set('oldGuest1234', { name: 'Legacy guest', createdAt: '2026-01-01' })
+    records.set('oldGuest1234', { name: 'សុីណាត', createdAt: '2026-01-01' })
+    assert.equal((await (await handler(request('GET', undefined, false, '?id=oldGuest1234'))).json()).name, 'ស៊ីណាត')
     assert.equal((await (await handler(request('GET', undefined, false, '?id=oldGuest1234'))).json()).giftProcession, true)
     records.delete('oldGuest1234')
     assert.equal((await handler(request('POST', { action: 'addGroup', group: 'Friends' }))).status, 401)
@@ -96,6 +98,9 @@ test('admin sessions reject expired, tampered and password-rotated cookies', () 
 })
 
 test('Excel validation preserves Khmer names and rejects malformed rows', () => {
+  assert.equal(normalizeKhmerName('លោកស្រី សុីណាត'), 'លោកស្រី ស៊ីណាត')
+  assert.equal(normalizeKhmerName('ស៊ីណាត សុខា Victor'), 'ស៊ីណាត សុខា Victor')
+  assert.equal(parseGuestRows([['Guest Name'], ['សុីណាត']])[0].name, 'ស៊ីណាត')
   assert.deepEqual(parseGuestRows([['Guest Name', 'Gift Procession', 'Group'], ['សុខា', 'Yes', 'Victor'], ['Guest', '', ''], [null, null, null]]), [
     { name: 'សុខា', giftProcession: true, group: 'Victor' }, { name: 'Guest', giftProcession: false, group: 'Unassigned' },
   ])

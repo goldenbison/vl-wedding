@@ -2,6 +2,7 @@ import { getStore } from '@netlify/blobs'
 import { randomBytes, timingSafeEqual, createHash } from 'node:crypto'
 import { DEFAULT_GROUPS, validGroup, normalizeInvitation } from '../../src/modules/invitation-fields.js'
 import { sessionCookie, clearSessionCookie, validSession } from '../lib/admin-session.mjs'
+import { normalizeKhmerName } from '../../src/modules/khmer-name.js'
 
 const json = (data, status = 200) => new Response(JSON.stringify(data), {
   status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' },
@@ -23,7 +24,7 @@ return async function handler(request) {
       if (!/^[A-Za-z0-9_-]{12}$/.test(id)) return json({ error: 'Invitation not found.' }, 404)
       const item = await openStore().get(id, { type: 'json' })
       if (item?.disabled) return json({ error: 'This invitation is currently unavailable. Please contact the couple.' }, 410)
-      return item ? json({ name: item.name, giftProcession: item.giftProcession !== false }) : json({ error: 'Invitation not found.' }, 404)
+      return item ? json({ name: normalizeKhmerName(item.name), giftProcession: item.giftProcession !== false }) : json({ error: 'Invitation not found.' }, 404)
     }
     const password = process.env.ADMIN_PASSWORD
     if (!password) return json({ error: 'Add ADMIN_PASSWORD in Netlify environment variables, then redeploy to enable the admin page.' }, 503)
@@ -78,7 +79,7 @@ return async function handler(request) {
       if (!result.modified) return json({ error: 'This invitation changed. Refresh the list and try again.' }, 409)
       return json({ id, ...item })
     }
-    const name = typeof body?.name === 'string' ? body.name.trim() : ''
+    const name = typeof body?.name === 'string' ? normalizeKhmerName(body.name.trim()) : ''
     if (!name || name.length > 60 || /[\u0000-\u001f\u007f]/.test(name)) return json({ error: 'Enter a guest name of 1–60 characters.' }, 400)
     const item = { name, giftProcession: body.giftProcession === true, group: body.group?.trim() || 'Unassigned', createdAt: new Date().toISOString() }
     // Stable per-row ID makes retries after interrupted Excel imports safe.
@@ -87,7 +88,7 @@ return async function handler(request) {
       const result = await store.setJSON(body.requestId, item, { onlyIfNew: true })
       if (result.modified) return json({ id: body.requestId, ...item }, 201)
       const existing = await store.get(body.requestId, { type: 'json' })
-      if (existing && existing.name === name && existing.group === item.group && existing.giftProcession === item.giftProcession) return json({ id: body.requestId, ...existing })
+      if (existing && normalizeKhmerName(existing.name) === name && existing.group === item.group && existing.giftProcession === item.giftProcession) return json({ id: body.requestId, ...normalizeInvitation(existing) })
       return json({ error: 'This import row conflicts with an existing invitation.' }, 409)
     }
     for (let attempt = 0; attempt < 5; attempt++) {
