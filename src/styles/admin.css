@@ -1,7 +1,7 @@
 :root { color-scheme: dark; font-family: system-ui, sans-serif; color: #f2e3bb; background: #0e1040; }
 * { box-sizing: border-box; }
 body { margin: 0; background: radial-gradient(ellipse at top, #293466, #0e1040 65%); min-height: 100vh; }
-main { max-width: 780px; margin: auto; padding: 56px 20px; }
+main { max-width: 1400px; margin: auto; padding: 40px 28px; }
 header { margin-bottom: 32px; }
 .eyebrow { color: #dfb469; letter-spacing: 2px; font-size: 12px; }
 h1 { font: 42px Georgia, serif; margin: 12px 0; }
@@ -39,3 +39,29 @@ select { width: 100%; padding: 12px; border: 1px solid #d9ae6360; border-radius:
 .table-scroll { overflow: auto; max-height: 320px; margin: 16px 0; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; } td, th { text-align: left; padding: 10px; border-bottom: 1px solid #d9ae6340; }
 @media(max-width: 480px) { main { padding: 30px 16px; } .panel { padding: 20px 16px; } h1 { font-size: 34px; } .heading h2 { font-size: 21px; } }
+
+/* Desktop split workspace: keep the searchable guest list beside the tools. */
+#login-panel { max-width: 680px; margin-inline: auto; }
+#workspace { display: grid; grid-template-columns: minmax(340px, .85fr) minmax(0, 1.15fr); gap: 24px; align-items: start; }
+#workspace .panel { margin: 0; min-width: 0; }
+.admin-tools { min-width: 0; display: grid; gap: 24px; }
+.guest-sidebar { position: sticky; top: 24px; display: flex; flex-direction: column; max-height: calc(100dvh - 48px); padding: 24px; }
+.sidebar-filters { flex: none; }
+.guest-list-scroll { min-height: 0; overflow-y: auto; scrollbar-gutter: stable; padding: 4px 6px 6px; margin: 0 -6px; }
+.guest-list-scroll ul { margin: 0; }
+.guest-sidebar li { flex-direction: column; align-items: stretch; gap: 0; }
+.guest-sidebar li strong { font-size: 16px; }
+.guest-sidebar .link-actions { gap: 8px; }
+.guest-sidebar button { padding-inline: 14px; }
+.guest-sidebar .heading { flex-wrap: wrap; gap: 10px; }
+.guest-sidebar .heading h2 { font-size: 24px; }
+.guest-settings { margin-bottom: 14px; }
+#status { z-index: 5; box-shadow: 0 6px 24px #0004; }
+#create-panel { scroll-margin-top: 20px; }
+.mobile-create { display: none; }
+@media(max-width: 850px) {
+  #workspace { grid-template-columns: minmax(0, 1fr); }
+  .guest-sidebar { position: static; max-height: none; }
+  .guest-list-scroll { max-height: 55svh; }
+  .mobile-create { display: inline-block; margin-bottom: 16px; font-size: 14px; }
+}
