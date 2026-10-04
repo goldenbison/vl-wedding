@@ -141,6 +141,15 @@
   pointer-events: none;
 }
 .env-guest-name > span, .hero-guest-name > span, .env-open-label > span { flex: none; display: block; }
+.env-guest-name > span, .hero-guest-name > span {
+  font-family: var(--font-guest);
+  font-weight: 700;
+  font-synthesis: none;
+  letter-spacing: normal;
+  word-spacing: normal;
+  line-height: 1.9;
+  overflow: visible;
+}
 
 /* ---- back: the printed gatefold ------------------------------------------ */
 .env-side-back {
