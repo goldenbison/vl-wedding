@@ -14,6 +14,7 @@ button { border: 0; border-radius: 8px; background: #dfb469; color: #171832; fon
 form > button { margin-top: 18px; }
 button:disabled { opacity: .5; cursor: wait; }
 .quiet { background: transparent; color: #ecd6a0; border: 1px solid #d9ae6350; }
+.download-template { display: inline-block; border-radius: 8px; padding: 13px 20px; font: 600 15px system-ui, sans-serif; text-decoration: none; min-height: 44px; }
 .heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .heading h2 { margin: 0; }
 .hint { font-size: 13px; color: #babbd2; }

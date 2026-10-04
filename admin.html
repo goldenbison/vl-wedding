@@ -30,7 +30,7 @@
       </section>
       <section class="panel"><h2>Guest groups</h2><form id="add-group"><label for="new-group">Add a group</label><input id="new-group" maxlength="40" required placeholder="Group name" /><button>Add group</button></form></section>
       <section class="panel"><h2>Import from Excel</h2><p class="hint">Upload an .xlsx workbook with columns Guest Name, Gift Procession (Yes/No), and Group. Blank procession = No; blank group = Unassigned. New groups are added automatically. Up to 1,000 guests per sheet. Review before importing.</p>
-        <button id="template" class="quiet" type="button">Download Excel template</button>
+        <a id="template" class="quiet download-template" href="/assets/guest-import-template.xlsx" download>Download Excel template</a>
         <label for="excel-file">Excel workbook (.xlsx, up to 5 MB)</label><input id="excel-file" type="file" accept=".xlsx" />
         <label for="sheet" hidden id="sheet-label">Worksheet</label><select id="sheet" hidden></select>
         <div id="import-review" hidden><p id="import-summary"></p><div class="table-scroll"><table><thead><tr><th>Guest</th><th>Procession</th><th>Group</th></tr></thead><tbody id="import-rows"></tbody></table></div><p id="import-detail" class="hint"></p><button id="import-confirm" type="button">Create invitation links</button></div>

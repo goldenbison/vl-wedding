@@ -70,14 +70,5 @@ export function initImport({ api, status, onItem, onComplete, getItems }) {
         status('Workbook ready. Review the selected sheet.'); review()
       } catch (error) { status(error.message); $('#sheet').hidden = true; $('#sheet-label').hidden = true }
     },
-    async template() {
-      const { default: writeXlsxFile } = await import('write-excel-file/browser')
-      const data = [
-        ['Guest Name', 'Gift Procession', 'Group'],
-        ['Example Guest — replace this row', 'No', 'Unassigned'],
-        ['លោក និងលោកស្រី សុខា', 'Yes', 'Victor'],
-      ].map(row => row.map(value => ({ type: String, value })))
-      await writeXlsxFile(data, { columns: [{ width: 42 }, { width: 22 }, { width: 22 }] }).toFile('guest-import-template.xlsx')
-    },
   }
 }

@@ -116,9 +116,22 @@ $('#add-group').addEventListener('submit', async event => {
   finally { event.submitter.disabled = false }
 })
 let excelModule
-async function excel() { return excelModule ||= import('./modules/admin-import.js').then(({ initImport }) => initImport({ api, status, onItem: remember, onComplete: () => { renderGroups(); render() }, getItems: () => items })) }
-$('#excel-file').addEventListener('change', async () => { try { (await excel()).load($('#excel-file').files[0]) } catch (error) { status(error.message) } })
-$('#template').addEventListener('click', async () => { try { await (await excel()).template() } catch (error) { status(error.message) } })
+async function excel() {
+  if (!excelModule) excelModule = import('./modules/admin-import.js')
+    .then(({ initImport }) => initImport({ api, status, onItem: remember, onComplete: () => { renderGroups(); render() }, getItems: () => items }))
+    .catch(error => { excelModule = undefined; throw error })
+  return excelModule
+}
+$('#excel-file').addEventListener('change', async () => {
+  try { await (await excel()).load($('#excel-file').files[0]) }
+  catch {
+    $('#excel-file').value = ''
+    status('The import tool could not load. Check your connection, or refresh to get the latest version. Your saved invitations are safe. ')
+    const reload = document.createElement('button'); reload.type = 'button'; reload.textContent = 'Refresh admin'
+    reload.addEventListener('click', () => { if (confirm('Refresh the admin page? Unsaved form entries will be lost.')) location.reload() })
+    $('#status').append(reload)
+  }
+})
 renderGroups()
 $('#refresh').addEventListener('click', async () => { try { await refresh(); status('Invitations refreshed.') } catch (error) { status(error.message) } })
 $('#logout').addEventListener('click', async () => {

@@ -6,7 +6,7 @@
   "description": "Digital wedding invitation — Khov Ty Victor & Nith Luxlakna · 04.11.2026",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/build-guest-template.mjs && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
