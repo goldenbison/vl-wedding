@@ -29,3 +29,20 @@ test('unrelated paths and failed responses pass through unchanged', async () => 
   const missing = new Response('missing', { status: 404 })
   assert.equal(await preview(new Request('https://example.com/i/Fcly_VYoKEby'), { next: async () => missing }), missing)
 })
+
+test('Meta range requests fetch a full document before metadata rewriting', async () => {
+  const html = await readFile(new URL('../index.html', import.meta.url), 'utf8')
+  const response = await preview(new Request('https://victorlakna.com/i/iTCCpRjsYt_T', {
+    headers: { Range: 'bytes=0-524288', 'If-Range': 'old-etag', 'User-Agent': 'facebookexternalhit/1.1' },
+  }), {
+    next: async request => {
+      assert.equal(request.headers.get('range'), null)
+      assert.equal(request.headers.get('if-range'), null)
+      assert.equal(request.headers.get('user-agent'), 'facebookexternalhit/1.1')
+      return new Response(html, { headers: { 'content-type': 'text/html', 'accept-ranges': 'bytes' } })
+    },
+  })
+  assert.equal(response.status, 200)
+  assert.equal(response.headers.get('accept-ranges'), null)
+  assert.ok((await response.text()).includes('<meta property="og:url" content="https://victorlakna.com/i/iTCCpRjsYt_T" />'))
+})
