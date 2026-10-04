@@ -83,7 +83,10 @@ Visit `/admin` to enter guest names, save invitations, search the saved list,
 and copy short links such as `https://victorlakna.com/i/AbCdEf123456`.
 Links are stored in a site-wide Netlify Blobs store and survive redeploys.
 Anyone with a guest's link can view that invitation; the guest list and creation
-endpoint require the admin password. Passwords stay in memory only in the admin browser.
+endpoint require admin authentication. Signing in creates a secure HttpOnly session
+cookie valid for eight hours, so refreshing keeps you signed in. Sign out clears it.
+The password is not saved in browser storage; changing ADMIN_PASSWORD invalidates
+previous sessions. Guest records are reloaded from the server after a refresh.
 
 Before deploying, set a long, unique `ADMIN_PASSWORD` in Netlify → Project
 configuration → Environment variables (available to Functions), then redeploy.

@@ -2,6 +2,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { createHandler } from '../netlify/functions/invitations.mjs'
 import { parseGuestRows, DEFAULT_GROUPS } from '../src/modules/invitation-fields.js'
+import { sessionCookie, validSession } from '../netlify/lib/admin-session.mjs'
 
 test('private creation/listing and public cross-session resolution', async () => {
   const records = new Map()
@@ -21,6 +22,15 @@ test('private creation/listing and public cross-session resolution', async () =>
   })
   try {
     assert.equal((await handler(request('GET'))).status, 401)
+    assert.equal((await handler(request('POST', undefined, false, '?session'))).status, 401)
+    const login = await handler(request('POST', undefined, true, '?session'))
+    assert.equal(login.status, 200)
+    const cookie = login.headers.get('set-cookie')
+    assert.match(cookie, /HttpOnly; Secure; SameSite=Strict/)
+    const restored = await handler(new Request('https://example.com/api/invitations', { headers: { Cookie: cookie.split(';')[0] } }))
+    assert.equal(restored.status, 200)
+    const logout = await handler(request('DELETE', undefined, false, '?session'))
+    assert.match(logout.headers.get('set-cookie'), /Max-Age=0/)
     assert.equal((await handler(request('POST', { name: 'Guest' }))).status, 401)
     for (const name of ['', 'x'.repeat(61), '\u0000']) assert.equal((await handler(request('POST', { name }, true))).status, 400)
     const response = await handler(request('POST', { name: 'លោក និងលោកស្រី សុខា' }, true))
@@ -72,6 +82,17 @@ test('private creation/listing and public cross-session resolution', async () =>
     delete process.env.ADMIN_PASSWORD
     assert.equal((await handler(request('POST', { name: 'Guest' }, true))).status, 503)
   } finally { if (previous === undefined) delete process.env.ADMIN_PASSWORD; else process.env.ADMIN_PASSWORD = previous }
+})
+
+test('admin sessions reject expired, tampered and password-rotated cookies', () => {
+  const now = 1800000000000
+  const cookie = sessionCookie('secret', now).split(';')[0]
+  const req = value => new Request('https://example.com/api/invitations', { headers: { Cookie: value } })
+  assert.equal(validSession(req(cookie), 'secret', now), true)
+  assert.equal(validSession(req(cookie), 'secret', now + 8 * 60 * 60 * 1000), false)
+  assert.equal(validSession(req(cookie), 'changed', now), false)
+  assert.equal(validSession(req(cookie + 'x'), 'secret', now), false)
+  assert.equal(validSession(req('wedding_admin=garbage'), 'secret', now), false)
 })
 
 test('Excel validation preserves Khmer names and rejects malformed rows', () => {

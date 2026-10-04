@@ -17,10 +17,10 @@ function remember(item) {
 const linkFor = id => `${location.origin}/i/${id}`
 const status = message => { $('#status').textContent = message }
 async function api(method = 'GET', data, id) {
-  const response = await fetch(`/api/invitations${id ? `?id=${encodeURIComponent(id)}` : ''}`, { method, headers: { Authorization: `Bearer ${password}`, 'Content-Type': 'application/json' }, ...(data ? { body: JSON.stringify(data) } : {}) })
+  const response = await fetch(`/api/invitations${id === 'session' ? '?session' : id ? `?id=${encodeURIComponent(id)}` : ''}`, { method, credentials: 'same-origin', headers: { ...(password ? { Authorization: `Bearer ${password}` } : {}), 'Content-Type': 'application/json' }, ...(data ? { body: JSON.stringify(data) } : {}) })
   if (!response.headers.get('content-type')?.includes('application/json')) throw new Error('The link service needs Netlify Functions. Deploy to Netlify or use netlify dev for local testing.')
   const result = await response.json()
-  if (!response.ok) throw new Error(result.error || 'Could not load invitations.')
+  if (!response.ok) { const error = new Error(result.error || 'Could not load invitations.'); error.status = response.status; throw error }
   return result
 }
 async function copy(url) {
@@ -91,9 +91,9 @@ async function refresh() { const data = await api(); items = data.items.map(norm
 $('#login').addEventListener('submit', async event => {
   event.preventDefault(); const button = event.submitter; button.disabled = true; status('Signing in…')
   password = $('#password').value
-  try { await refresh(); $('#login-panel').hidden = true; $('#workspace').hidden = false; $('#password').value = ''; status(''); $('#name').focus() }
+  try { await api('POST', undefined, 'session'); password = ''; await refresh(); $('#login-panel').hidden = true; $('#workspace').hidden = false; $('#password').value = ''; status(''); $('#name').focus() }
   catch (error) { password = ''; status(error.message) }
-  finally { button.disabled = false }
+  finally { password = ''; $('#password').value = ''; button.disabled = false }
 })
 $('#create').addEventListener('submit', async event => {
   event.preventDefault(); const button = event.submitter; button.disabled = true; status('Creating invitation…')
@@ -121,9 +121,24 @@ $('#excel-file').addEventListener('change', async () => { try { (await excel()).
 $('#template').addEventListener('click', async () => { try { await (await excel()).template() } catch (error) { status(error.message) } })
 renderGroups()
 $('#refresh').addEventListener('click', async () => { try { await refresh(); status('Invitations refreshed.') } catch (error) { status(error.message) } })
-$('#logout').addEventListener('click', () => {
+$('#logout').addEventListener('click', async () => {
+  $('#logout').disabled = true
+  try { await api('DELETE', undefined, 'session') }
+  catch (error) { status(`Could not sign out: ${error.message}`); return }
+  finally { $('#logout').disabled = false }
   if (excelModule) excelModule.then(module => module.reset())
   groups = [...DEFAULT_GROUPS]; renderGroups()
   password = ''; items = []; $('#links').replaceChildren(); $('#result').hidden = true; $('#result-url').value = ''; $('#result-name').textContent = ''; $('#open-result').removeAttribute('href'); $('#name').value = ''
   $('#workspace').hidden = true; $('#login-panel').hidden = false; status('Signed out.'); $('#password').focus()
 })
+
+// The browser sends the HttpOnly session cookie; no password is stored in JS storage.
+async function restoreSession() {
+  const button = $('#login button'); button.disabled = true
+  status('Checking your session…')
+  try {
+    await refresh(); $('#login-panel').hidden = true; $('#workspace').hidden = false; status('')
+  } catch (error) { status(error.status === 401 ? '' : error.message) }
+  finally { button.disabled = false }
+}
+restoreSession()

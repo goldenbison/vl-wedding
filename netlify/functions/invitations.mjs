@@ -1,6 +1,7 @@
 import { getStore } from '@netlify/blobs'
 import { randomBytes, timingSafeEqual, createHash } from 'node:crypto'
 import { DEFAULT_GROUPS, validGroup, normalizeInvitation } from '../../src/modules/invitation-fields.js'
+import { sessionCookie, clearSessionCookie, validSession } from '../lib/admin-session.mjs'
 
 const json = (data, status = 200) => new Response(JSON.stringify(data), {
   status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' },
@@ -12,6 +13,11 @@ return async function handler(request) {
   const url = new URL(request.url)
   const id = url.searchParams.get('id')
   try {
+    if (request.method === 'DELETE' && url.searchParams.has('session')) {
+      const response = json({ signedOut: true })
+      response.headers.set('Set-Cookie', clearSessionCookie())
+      return response
+    }
     // Public lookup reveals only the name belonging to this unguessable link.
     if (request.method === 'GET' && id) {
       if (!/^[A-Za-z0-9_-]{12}$/.test(id)) return json({ error: 'Invitation not found.' }, 404)
@@ -22,7 +28,14 @@ return async function handler(request) {
     const password = process.env.ADMIN_PASSWORD
     if (!password) return json({ error: 'Add ADMIN_PASSWORD in Netlify environment variables, then redeploy to enable the admin page.' }, 503)
     const supplied = request.headers.get('authorization') || ''
-    if (!timingSafeEqual(hash(supplied), hash(`Bearer ${password}`))) return json({ error: 'Incorrect admin password.' }, 401)
+    const passwordValid = timingSafeEqual(hash(supplied), hash(`Bearer ${password}`))
+    if (!passwordValid && !validSession(request, password)) return json({ error: 'Please sign in again.' }, 401)
+    if (request.method === 'POST' && url.searchParams.has('session')) {
+      if (!passwordValid) return json({ error: 'Enter your admin password.' }, 401)
+      const response = json({ signedIn: true })
+      response.headers.set('Set-Cookie', sessionCookie(password))
+      return response
+    }
     const store = openStore()
     if (request.method === 'GET') {
       const { blobs } = await store.list()
