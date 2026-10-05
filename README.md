@@ -110,6 +110,13 @@ Re-uploading a workbook is a new import and can create duplicate guests.
 
 Run `node --test tests/invitations.test.mjs` to check API access control and link resolution.
 
+Khmer guest names use `src/modules/khmer-name.js` on public reads, admin creation,
+and spreadsheet import. It orders whole Khmer syllables and repairs legacy
+lowered-shifter / decomposed-vowel typing for mobile WebKit. It preserves consonant
+letters, coeng pairs, explicit shifters and join controls; it is not a spelling
+checker and does not guess missing letters. Existing stored records are not migrated.
+Run `node --test tests/*.test.mjs` for the consonant/vowel regression matrix and API tests.
+
 - Music starts only after the guest taps open (browsers require a gesture); the on/off
   choice is remembered per browser.
 - Tap any panel to zoom it (lightbox); pinch-zoom also works.

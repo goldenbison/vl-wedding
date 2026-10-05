@@ -42,7 +42,7 @@ function renderEnvelope() {
   g.style.top = `${box.top}%`
   g.style.width = `${box.width}%`
   g.style.height = `${box.height}%`
-  g.innerHTML = `<span>${esc(guestName)}</span>`
+  g.innerHTML = `<span lang="km">${esc(guestName)}</span>`
 
   const openBtn = $('#envOpenBtn')
   openBtn.innerHTML = `<span class="env-open-frame"><span class="env-open-label"><span>${esc(misc.openButton)}</span></span></span>`
@@ -64,7 +64,7 @@ function renderHero() {
       <div class="hero-guest-block">
         <div class="hero-guest-frame">
           <img src="${esc(art.guestFrame.src)}" alt="${esc(misc.guestLabel)}" draggable="false" />
-          <span class="hero-guest-name"><span>${esc(guestName)}</span></span>
+          <span class="hero-guest-name"><span lang="km">${esc(guestName)}</span></span>
         </div>
       </div>` : ''}
       <div class="countdown" id="countdown"></div>

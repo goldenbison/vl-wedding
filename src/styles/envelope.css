@@ -147,6 +147,11 @@
   font-synthesis: none;
   letter-spacing: normal;
   word-spacing: normal;
+  /* Keep a Khmer syllable in one shaping run on mobile WebKit. */
+  word-break: normal;
+  overflow-wrap: normal;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   line-height: 1.9;
   overflow: visible;
 }

@@ -49,6 +49,10 @@ test('private creation/listing and public cross-session resolution', async () =>
     records.set('oldGuest1234', { name: 'សុីណាត', createdAt: '2026-01-01' })
     assert.equal((await (await handler(request('GET', undefined, false, '?id=oldGuest1234'))).json()).name, 'ស៊ីណាត')
     assert.equal((await (await handler(request('GET', undefined, false, '?id=oldGuest1234'))).json()).giftProcession, true)
+    // Older links are repaired on read, without rewriting stored guest records.
+    records.set('oldGuest1234', { name: 'សុីណាត មុី កំុ', createdAt: '2026-01-01' })
+    assert.equal((await (await handler(request('GET', undefined, false, '?id=oldGuest1234'))).json()).name, 'ស៊ីណាត ម៉ី កុំ')
+    assert.equal(records.get('oldGuest1234').name, 'សុីណាត មុី កំុ')
     records.delete('oldGuest1234')
     assert.equal((await handler(request('POST', { action: 'addGroup', group: 'Friends' }))).status, 401)
     assert.equal((await handler(request('POST', { action: 'addGroup', group: 'Friends' }, true))).status, 201)
