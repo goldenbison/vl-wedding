@@ -23,7 +23,11 @@ export function fitGuestNames() {
   boxes.forEach(box => observer.observe(box))
   // Hidden hero content does not necessarily trigger font loading by itself.
   // Explicitly request the complete font before measuring either name frame.
-  document.fonts.load('700 20px "Guest Khmer"').then(() => boxes.forEach(fit)).catch(() => boxes.forEach(fit))
+  const sample = boxes.map(box => box.textContent).join(' ')
+  Promise.all([
+    document.fonts.load('700 20px "Guest Khmer"', sample),
+    document.fonts.load('700 20px "Guest Latin"', sample),
+  ]).then(() => boxes.forEach(fit)).catch(() => boxes.forEach(fit))
   document.fonts.ready.then(() => boxes.forEach(fit))
   document.fonts.addEventListener('loadingdone', () => boxes.forEach(fit))
 }

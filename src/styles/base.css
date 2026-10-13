@@ -2,6 +2,14 @@
    Base: tokens (sampled from the printed artwork), reset, typography
    ========================================================================== */
 @font-face {
+  font-family: 'Guest Latin';
+  src: url('/assets/guest-latin-bold.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 700;
+  font-display: block;
+  unicode-range: U+0000-024F, U+0300-036F, U+1E00-1EFF, U+2000-206F;
+}
+@font-face {
   font-family: 'Guest Khmer';
   src: url('/assets/guest-khmer-bold.ttf') format('truetype');
   font-style: normal;
@@ -32,7 +40,7 @@
 
   --font-moul: 'Moul', 'Khmer OS Muol Light', serif;
   --font-kh: 'Battambang', 'Khmer OS', sans-serif;
-  --font-guest: 'Guest Khmer', 'Battambang', sans-serif;
+  --font-guest: 'Guest Latin', 'Guest Khmer', 'Battambang', sans-serif;
   --font-caps: 'Cinzel', 'Times New Roman', serif;
   --font-serif: 'Cormorant Garamond', Georgia, serif;
 }
